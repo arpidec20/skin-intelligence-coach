@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Intelligence Coach</title>
+<style>
+:root{
+  --cream:#FAF6F0; --card:#FFFFFF; --ink:#221E1A; --ink2:#5C554C; --ink3:#8A8177;
+  --sage:#5F7D6C; --sage-d:#48604F; --sage-l:#E7EEE9; --sage-xl:#F2F6F3;
+  --clay:#C4795A; --clay-l:#F7E9E2; --gold:#B99B5F; --gold-l:#F5EEDF;
+  --blush:#D8A79B; --line:#EAE3D9; --line2:#DDD4C7;
+  --good:#3E7A52; --warn:#A8752B; --bad:#A9432F; --bad-l:#F8E7E2; --warn-l:#F6EEDC; --good-l:#E5F0E8;
+  --r-lg:22px; --r-md:14px; --r-sm:9px;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 28px rgba(40,32,20,.07);
+  --shadow-lg:0 2px 6px rgba(40,32,20,.06),0 18px 50px rgba(40,32,20,.12);
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+h1,h2,h3,.serif{font-family:var(--serif);font-weight:600;letter-spacing:.01em}
+
+/* ---------- Shell ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,240,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.02em}
+.logo-mark{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#7d9c8a,var(--sage-d));display:grid;place-items:center;color:#fff;font-size:15px;font-family:var(--serif)}
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav button{padding:8px 13px;border-radius:99px;font-size:13.5px;color:var(--ink2);transition:.18s}
+.nav button:hover{background:var(--sage-xl);color:var(--ink)}
+.nav button.active{background:var(--ink);color:#fff}
+.nav button .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--clay);margin-left:6px;vertical-align:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:34px 24px 90px}
+.view{display:none;animation:fade .35s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- Type & generic ---------- */
+.eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);font-weight:700;margin-bottom:10px}
+.h-display{font-size:clamp(30px,4.6vw,46px);line-height:1.12;margin-bottom:14px}
+.h-display em{font-style:italic;color:var(--sage-d)}
+.lede{font-size:16.5px;color:var(--ink2);max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.pad{padding:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:99px;font-size:14.5px;font-weight:600;transition:.18s}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#000;transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn-sage{background:var(--sage);color:#fff}
+.btn-sage:hover{background:var(--sage-d)}
+.btn-ghost{border:1.5px solid var(--line2);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--ink);background:#fff}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600}
+.chip-sage{background:var(--sage-l);color:var(--sage-d)}
+.chip-clay{background:var(--clay-l);color:#9a5a3e}
+.chip-gold{background:var(--gold-l);color:#8a6f38}
+.chip-line{border:1px solid var(--line2);color:var(--ink2)}
+.chip-bad{background:var(--bad-l);color:var(--bad)}
+.chip-good{background:var(--good-l);color:var(--good)}
+.chip-warn{background:var(--warn-l);color:var(--warn)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.muted{color:var(--ink3);font-size:13px}
+.small{font-size:13px;color:var(--ink2)}
+hr.soft{border:none;border-top:1px solid var(--line);margin:18px 0}
+.notice{display:flex;gap:10px;padding:13px 16px;border-radius:var(--r-md);font-size:13.5px;line-height:1.5}
+.notice.sage{background:var(--sage-xl);color:var(--sage-d)}
+.notice.warn{background:var(--warn-l);color:#7a5620}
+.notice.bad{background:var(--bad-l);color:var(--bad)}
+
+/* ---------- Home ---------- */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;padding:38px 0 20px}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+.hero-visual{position:relative;background:linear-gradient(160deg,#EDF2EE,#F7F1E7 70%);border-radius:28px;padding:30px;display:grid;place-items:center;min-height:360px;border:1px solid var(--line)}
+.hero-stats{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
+.hero-stat b{display:block;font-family:var(--serif);font-size:26px}
+.hero-stat span{font-size:12.5px;color:var(--ink3)}
+.step-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
+@media(max-width:860px){.step-cards{grid-template-columns:1fr}}
+.step-card{padding:22px;position:relative}
+.step-num{font-family:var(--serif);font-size:30px;color:var(--gold);font-style:italic}
+.step-card h3{font-size:17px;margin:6px 0 6px}
+.step-card p{font-size:13.5px;color:var(--ink2)}
+
+/* ---------- Quiz ---------- */
+.quiz-shell{max-width:760px;margin:0 auto}
+.progress-track{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin:18px 0 30px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sage),var(--gold));border-radius:99px;transition:width .4s ease}
+.qstep{display:none}
+.qstep.on{display:block;animation:fade .3s ease}
+.qtitle{font-size:25px;margin-bottom:6px}
+.qsub{color:var(--ink2);font-size:14.5px;margin-bottom:22px}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.opt{border:1.5px solid var(--line2);border-radius:var(--r-md);padding:15px 16px;background:#fff;text-align:left;transition:.15s;font-size:14px;position:relative}
+.opt:hover{border-color:var(--sage);transform:translateY(-1px)}
+.opt.sel{border-color:var(--sage-d);background:var(--sage-xl);box-shadow:0 0 0 1px var(--sage-d)}
+.opt .oi{font-size:20px;display:block;margin-bottom:6px}
+.opt b{display:block;font-size:14.5px}
+.opt span{font-size:12.5px;color:var(--ink3)}
+.opt .tick{position:absolute;top:10px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--sage-d);color:#fff;font-size:11px;display:none;place-items:center}
+.opt.sel .tick{display:grid}
+.quiz-nav{display:flex;justify-content:space-between;margin-top:30px;align-items:center}
+
+/* ---------- Face map ---------- */
+.fm-layout{display:grid;grid-template-columns:minmax(300px,430px) 1fr;gap:30px;align-items:start}
+@media(max-width:900px){.fm-layout{grid-template-columns:1fr}}
+.face-stage{padding:18px;display:grid;place-items:center;position:sticky;top:86px}
+@media(max-width:900px){.face-stage{position:static}}
+.zone{fill:rgba(95,125,108,0);stroke:rgba(95,125,108,0);stroke-width:1.5;cursor:pointer;transition:.2s}
+.zone:hover{fill:rgba(95,125,108,.22);stroke:var(--sage)}
+.zone.sel{fill:rgba(196,121,90,.30);stroke:var(--clay)}
+.zone-label{font-size:9.5px;fill:var(--ink3);pointer-events:none;font-family:var(--sans);opacity:0;transition:.2s}
+.zone-g:hover .zone-label,.zone-g.sel .zone-label{opacity:1}
+.zone-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.zone-pill{padding:7px 14px;border-radius:99px;border:1.5px solid var(--line2);font-size:12.5px;transition:.15s}
+.zone-pill:hover{border-color:var(--sage)}
+.zone-pill.sel{background:var(--clay);border-color:var(--clay);color:#fff}
+.zone-detail{margin-bottom:16px}
+.zd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.active-row{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line);align-items:flex-start}
+.active-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:17px;flex-shrink:0}
+.active-row h4{font-size:14.5px}
+.active-row p{font-size:12.5px;color:var(--ink2)}
+.mini-prods{font-size:12px;color:var(--ink3);margin-top:4px}
+.mini-prods b{color:var(--ink2);font-weight:600}
+
+/* ---------- Ingredient library ---------- */
+.ing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.ing-card{padding:20px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.ing-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.ing-card .band{position:absolute;top:0;left:0;right:0;height:5px}
+.ing-emoji{font-size:26px}
+.ing-card h3{font-size:17px;margin:8px 0 2px}
+.ing-card .cat{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.ing-card p{font-size:13px;color:var(--ink2);margin-top:8px}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 22px}
+.fbtn{padding:7px 15px;border-radius:99px;border:1.5px solid var(--line2);font-size:13px}
+.fbtn.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- Modal ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(30,25,18,.45);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
+.modal-bg.on{display:flex}
+.modal{background:var(--cream);border-radius:26px;max-width:680px;width:100%;box-shadow:var(--shadow-lg);animation:fade .25s ease;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--line2);font-size:15px;z-index:2}
+.modal-head{padding:30px 30px 20px;border-radius:26px 26px 0 0}
+.modal-body{padding:24px 30px 30px}
+.usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:600px){.usage-grid{grid-template-columns:1fr}}
+.usage-box{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
+.usage-box h5{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.freq-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.freq-table td{padding:7px 4px;border-top:1px solid var(--line)}
+.freq-table td:first-child{font-weight:600;width:110px}
+.check li,.cross li{list-style:none;padding:4px 0 4px 26px;position:relative;font-size:13.5px}
+.check li:before{content:"✓";position:absolute;left:4px;color:var(--good);font-weight:700}
+.cross li:before{content:"!";position:absolute;left:7px;color:var(--warn);font-weight:800}
+
+/* ---------- Results / plan ---------- */
+.profile-banner{background:linear-gradient(135deg,#2E3B33,#48604F 60%,#5F7D6C);color:#fff;border-radius:26px;padding:32px;margin-bottom:26px;position:relative;overflow:hidden}
+.profile-banner:after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.07)}
+.profile-banner h2{font-size:27px;margin-bottom:4px}
+.profile-banner .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.profile-banner .chip{background:rgba(255,255,255,.14);color:#fff;backdrop-filter:blur(4px)}
+.routine-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+@media(max-width:860px){.routine-cols{grid-template-columns:1fr}}
+.routine-col{padding:22px}
+.routine-col h3{display:flex;align-items:center;gap:9px;font-size:18px;margin-bottom:14px}
+.rstep{display:flex;gap:13px;padding:11px 0;border-top:1px solid var(--line);align-items:flex-start}
+.rstep-num{width:26px;height:26px;border-radius:50%;background:var(--sage-l);color:var(--sage-d);font-size:12.5px;font-weight:700;display:grid;place-items:center;flex-shrink:0;margin-top:2px}
+.rstep b{font-size:14px;display:block}
+.rstep .why{font-size:12.5px;color:var(--ink2)}
+.rstep .prod{font-size:12px;color:var(--sage-d);font-weight:600;margin-top:3px}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:14px}
+@media(max-width:760px){.week-grid{grid-template-columns:repeat(2,1fr)}}
+.day-cell{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 9px;font-size:11.5px;min-height:86px}
+.day-cell b{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.day-tag{display:block;padding:3px 7px;border-radius:6px;margin-top:4px;font-weight:600;font-size:10.5px}
+.conflict-item{border:1px solid var(--line);border-radius:var(--r-md);padding:15px 17px;margin-bottom:11px;background:#fff}
+.conflict-item .pair{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.conflict-item p{font-size:13px;color:var(--ink2);margin-top:5px}
+.sev{font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:99px;text-transform:uppercase}
+
+/* ---------- Product cards ---------- */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:16px;margin-top:16px}
+.prod-card{padding:19px;display:flex;flex-direction:column;gap:9px;transition:.18s}
+.prod-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.prod-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.prod-brand{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.prod-card h4{font-family:var(--serif);font-size:16.5px;line-height:1.25}
+.rank-badge{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+.stars{color:var(--gold);font-size:13px;letter-spacing:1px}
+.score-bar{height:5px;border-radius:99px;background:var(--line);overflow:hidden}
+.score-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sage),var(--gold))}
+.prod-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
+.buy-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
+.buy-chip{font-size:11px;padding:4px 10px;border-radius:99px;background:var(--sage-xl);color:var(--sage-d);font-weight:600}
+.review-line{font-size:12px;color:var(--ink2);font-style:italic}
+
+/* ---------- Tracker ---------- */
+.slider-row{margin-bottom:16px}
+.slider-row label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:6px}
+.slider-row output{color:var(--sage-d)}
+input[type=range]{width:100%;accent-color:var(--sage);height:26px}
+textarea,select,input[type=date]{width:100%;border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:10px 12px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+textarea:focus,select:focus{outline:none;border-color:var(--sage)}
+.photo-drop{border:2px dashed var(--line2);border-radius:var(--r-md);padding:20px;text-align:center;font-size:13px;color:var(--ink3);cursor:pointer;transition:.15s}
+.photo-drop:hover{border-color:var(--sage);color:var(--sage-d)}
+.photo-thumb{width:100%;max-height:180px;object-fit:cover;border-radius:var(--r-md);margin-top:10px}
+.entry-card{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line);align-items:flex-start}
+.entry-photo{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--sage-xl);flex-shrink:0;display:grid;place-items:center;font-size:22px}
+.metric-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chart-box{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:16px;position:relative}
+.chart-tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:11.5px;padding:5px 9px;border-radius:7px;transform:translate(-50%,-130%);white-space:nowrap;display:none;z-index:5}
+table.data-table{width:100%;border-collapse:collapse;font-size:13px}
+table.data-table th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:8px 6px;border-bottom:1px solid var(--line2)}
+table.data-table td{padding:8px 6px;border-bottom:1px solid var(--line)}
+
+/* ---------- Coach ---------- */
+.coach-msg{display:flex;gap:13px;margin-bottom:18px}
+.coach-avatar{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#7d9c8a,var(--sage-d));display:grid;place-items:center;color:#fff;flex-shrink:0;font-family:var(--serif);font-size:15px}
+.coach-bubble{background:#fff;border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:15px 18px;font-size:14px;max-width:560px}
+.coach-bubble.user{margin-left:auto;background:var(--sage-l);border-radius:18px 4px 18px 18px}
+.mood-row{display:flex;gap:12px;margin:8px 0 4px;flex-wrap:wrap}
+.mood-btn{flex:1;min-width:130px;padding:18px 14px;border:1.5px solid var(--line2);border-radius:var(--r-md);background:#fff;text-align:center;transition:.15s}
+.mood-btn:hover{border-color:var(--sage);transform:translateY(-2px)}
+.mood-btn .em{font-size:30px;display:block;margin-bottom:6px}
+.mood-btn b{font-size:14px}
+.mood-btn span{display:block;font-size:11.5px;color:var(--ink3)}
+.footer-note{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--ink3);text-align:center;max-width:760px;margin-left:auto;margin-right:auto}
+.locked{padding:60px 20px;text-align:center}
+.locked .big{font-size:40px}
+.locked h3{font-size:21px;margin:10px 0 6px}
+.locked p{color:var(--ink2);font-size:14px;margin-bottom:18px}
+.credit-footer{margin-top:14px;text-align:center;font-size:12.5px;color:var(--ink3)}
+.credit-footer b{color:var(--ink2)}
+.credit-sep{margin:0 8px;color:var(--line2)}
+.email-btn{color:var(--sage-d);font-weight:700;text-decoration:underline;font-size:12.5px;padding:0}
+.email-btn:hover{color:var(--sage)}
+.credit-link{color:var(--sage-d);font-weight:600;text-decoration:none}
+.credit-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo"><div class="logo-mark">S</div>Skin Intelligence <em style="font-style:italic;color:var(--sage-d)">Coach</em></div>
+    <nav class="nav" id="nav">
+      <button data-v="home" class="active">Home</button>
+      <button data-v="quiz">1 · Assessment</button>
+      <button data-v="facemap">2 · Face Map</button>
+      <button data-v="plan">3 · My Plan</button>
+      <button data-v="library">Ingredients</button>
+      <button data-v="conflicts">Conflict Checker</button>
+      <button data-v="tracker">Progress</button>
+      <button data-v="coach">Coach</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HOME ============ -->
+<section class="view on" id="v-home">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Dermatology-informed · Personalised · Educational</div>
+      <h1 class="h-display">Understand your skin.<br>Choose actives with <em>intelligence</em>.</h1>
+      <p class="lede">Stop buying random products. In a few minutes, map your skin type, concerns and face zones — then get a personalised routine of evidence-backed actives, checked for ingredient conflicts.</p>
+      <div style="display:flex;gap:12px;margin-top:26px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="go('quiz')">Start skin assessment →</button>
+        <button class="btn btn-ghost" onclick="go('library')">Explore ingredients</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b id="stat-actives">14</b><span>actives explained</span></div>
+        <div class="hero-stat"><b id="stat-prods">30+</b><span>ranked products</span></div>
+        <div class="hero-stat"><b>9</b><span>face zones mapped</span></div>
+        <div class="hero-stat"><b id="stat-conf">10</b><span>conflict rules</span></div>
+      </div>
+    </div>
+    <div class="hero-visual" id="hero-face"></div>
+  </div>
+
+  <div class="step-cards">
+    <div class="card step-card"><div class="step-num">01</div><h3>Profile your skin</h3><p>Skin type, concerns, sensitivity, life stage, climate and budget — the six inputs that decide which actives actually suit you.</p></div>
+    <div class="card step-card"><div class="step-num">02</div><h3>Map your face, zone by zone</h3><p>Your T-zone and your cheeks are different organs, practically speaking. Click each area to get zone-specific analysis and actives.</p></div>
+    <div class="card step-card"><div class="step-num">03</div><h3>Get a safe, ranked routine</h3><p>A morning + night routine with a weekly rotation calendar, conflict-checked combinations, and products ranked by evidence and value.</p></div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="view" id="v-quiz">
+  <div class="quiz-shell">
+    <div class="eyebrow">Step 1 of 3 · Skin profile</div>
+    <h2 class="serif" style="font-size:28px">Your skin assessment</h2>
+    <div class="progress-track"><div class="progress-fill" id="quiz-prog" style="width:8%"></div></div>
+    <div id="quiz-steps"></div>
+    <div class="quiz-nav">
+      <button class="btn btn-ghost btn-sm" id="q-back" onclick="quizNav(-1)">← Back</button>
+      <span class="muted" id="q-count"></span>
+      <button class="btn btn-primary btn-sm" id="q-next" onclick="quizNav(1)">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACE MAP ============ -->
+<section class="view" id="v-facemap">
+  <div class="eyebrow">Step 2 of 3 · Face zone analysis</div>
+  <h2 class="serif" style="font-size:28px;margin-bottom:6px">Where does your skin need help?</h2>
+  <p class="lede" style="margin-bottom:24px">Tap the zones that concern you. Each one gets its own analysis, recommended actives and product picks.</p>
+  <div class="fm-layout">
+    <div class="card face-stage"><div id="face-svg-holder"></div>
+      <div class="zone-list" id="zone-pills"></div>
+    </div>
+    <div>
+      <div id="zone-details"></div>
+      <div class="card pad" id="zone-empty">
+        <h3 class="serif" style="font-size:19px">No zones selected yet</h3>
+        <p class="small" style="margin-top:6px">Click directly on the face — forehead, T-zone, under-eyes, cheeks, nose, smile lines, lips, chin or neck — or use the pills under the illustration. You can select several.</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:22px;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="go('quiz')">← Back to assessment</button>
+        <button class="btn btn-primary" onclick="buildPlan()">Build my routine →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLAN ============ -->
+<section class="view" id="v-plan"><div id="plan-holder"></div></section>
+
+<!-- ============ LIBRARY ============ -->
+<section class="view" id="v-library">
+  <div class="eyebrow">Ingredient education</div>
+  <h2 class="serif" style="font-size:28px;margin-bottom:6px">The actives library</h2>
+  <p class="lede">Every active explained: what it does, who it's for, when to use it, and what never to layer it with. Tap a card for the full dossier.</p>
+  <div class="filter-row" id="lib-filters"></div>
+  <div class="ing-grid" id="ing-grid"></div>
+</section>
+
+<!-- ============ CONFLICTS ============ -->
+<section class="view" id="v-conflicts">
+  <div class="eyebrow">Safety layer</div>
+  <h2 class="serif" style="font-size:28px;margin-bottom:6px">Ingredient conflict checker</h2>
+  <p class="lede" style="margin-bottom:22px">Select everything you're using (or planning to use). The checker flags risky combinations and suggests how to schedule them across the week instead.</p>
+  <div class="grid2" style="grid-template-columns:.9fr 1.1fr">
+    <div class="card pad">
+      <h3 class="serif" style="font-size:18px;margin-bottom:12px">My actives</h3>
+      <div class="tagrow" id="cc-picks"></div>
+    </div>
+    <div id="cc-results"></div>
+  </div>
+</section>
+
+<!-- ============ TRACKER ============ -->
+<section class="view" id="v-tracker">
+  <div class="eyebrow">Progress tracker</div>
+  <h2 class="serif" style="font-size:28px;margin-bottom:6px">Is it working?</h2>
+  <p class="lede" style="margin-bottom:8px">Skin changes on an 8–12 week timescale. Log a weekly check-in — photo, scores, notes — and watch the trend, not the day-to-day noise.</p>
+  <p class="notice warn" style="max-width:720px;margin-bottom:22px">⚠️ <span>Entries live in this session's memory. Use <b>Export</b> to save your log as a file, and <b>Import</b> to bring it back next time.</span></p>
+  <div class="grid2" style="grid-template-columns:.9fr 1.1fr;align-items:start">
+    <div class="card pad">
+      <h3 class="serif" style="font-size:18px;margin-bottom:14px">New check-in</h3>
+      <div style="margin-bottom:14px"><label class="small" style="font-weight:600">Date</label><input type="date" id="tk-date"></div>
+      <div id="tk-sliders"></div>
+      <div style="margin-bottom:14px"><label class="small" style="font-weight:600">Notes</label><textarea id="tk-notes" rows="2" placeholder="New products started, reactions, weather, sleep…"></textarea></div>
+      <div class="photo-drop" id="photo-drop" onclick="document.getElementById('tk-photo').click()">📷 Add a progress photo (same light, same angle)<input type="file" id="tk-photo" accept="image/*" style="display:none"></div>
+      <div id="photo-preview"></div>
+      <button class="btn btn-sage" style="width:100%;justify-content:center;margin-top:16px" onclick="saveEntry()">Save check-in</button>
+    </div>
+    <div>
+      <div class="card pad" style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <h3 class="serif" style="font-size:18px">Trend</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="exportLog()">Export</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('tk-import').click()">Import</button>
+            <input type="file" id="tk-import" accept=".json" style="display:none">
+            <button class="btn btn-ghost btn-sm" id="tk-tablebtn" onclick="toggleTable()">Table</button>
+          </div>
+        </div>
+        <div class="metric-tabs" id="metric-tabs"></div>
+        <div class="chart-box"><div id="tk-chart"></div><div class="chart-tip" id="chart-tip"></div></div>
+        <div id="tk-table" style="display:none;margin-top:12px"></div>
+      </div>
+      <div class="card pad">
+        <h3 class="serif" style="font-size:18px;margin-bottom:6px">Check-in history</h3>
+        <div id="entry-list"><p class="muted">No entries yet. Your first check-in becomes your baseline.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COACH ============ -->
+<section class="view" id="v-coach"><div id="coach-holder"></div></section>
+
+<div class="footer-note">Skin Intelligence Coach is an educational tool, not a medical service. Patch-test new actives, introduce one at a time, and see a dermatologist for persistent acne, suspicious moles, rosacea, or anything painful. If pregnant or breastfeeding, avoid retinoids and check every active with your doctor.</div>
+<div class="credit-footer">Made by <b>Arpi Narula</b> using AI<span class="credit-sep">·</span>Email: <button class="email-btn" id="email-btn" onclick="toggleEmail()">Show</button><span id="email-val" style="display:none"><a class="credit-link" href="mailto:arpi20cs@gmail.com">arpi20cs@gmail.com</a> <button class="email-btn" onclick="toggleEmail()">(hide)</button></span><span class="credit-sep">·</span><a class="credit-link" href="https://www.linkedin.com/in/arpinarula/" target="_blank" rel="noopener">LinkedIn ↗</a></div>
+</div>
+
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+<script>
+/* =================== DATA =================== */
+const ACTIVES = {
+retinoids:{name:"Retinoids (Retinol / Retinal)",emoji:"🌙",cat:"Renewal",color:"#7B5EA7",
+  blurb:"The gold-standard anti-ageing active. Speeds cell turnover and signals skin to build collagen.",
+  what:"Retinoids are vitamin-A derivatives that increase cell turnover and support collagen production, helping reduce fine lines, smooth texture, fade pigmentation and keep pores clear. Retinal (retinaldehyde) works faster than retinol; adapalene is a prescription-strength option available OTC for acne.",
+  bestFor:["Mature skin & fine lines","Uneven texture","Acne & congestion","Pigmentation"],
+  avoid:["Pregnancy or breastfeeding (all retinoids — consult your doctor)","Extremely compromised or reactive barrier — repair first","Same night as strong AHA/BHA exfoliation"],
+  am:false,pm:true,
+  freq:{Beginner:"2 nights/week, pea-sized, buffer with moisturiser",Intermediate:"Every other night",Advanced:"Nightly, or step up strength"},
+  pairs:["ha","ceramides","peptides","niacinamide"],clash:["aha","bha"],
+  tip:"Start low, go slow. Mild flaking in weeks 1–3 is normal; stinging or burning is not."},
+bha:{name:"Salicylic Acid (BHA)",emoji:"🫧",cat:"Exfoliant",color:"#3F7FBF",
+  blurb:"Oil-soluble acid that gets inside the pore — the blackhead and T-zone specialist.",
+  what:"Salicylic acid is oil-soluble, so it exfoliates inside the pore lining where blackheads form. It dissolves the oil plugs behind blackheads, reduces sebum shine, calms red bumps (it's related to aspirin) and refines texture on oily zones.",
+  bestFor:["Oily & combination skin","Blackheads & clogged pores","Enlarged pores","Body breakouts"],
+  avoid:["Very dry or dehydrated skin (use sparingly, zone-targeted)","Aspirin allergy","Same night as retinoids while your skin is still adapting"],
+  am:true,pm:true,
+  freq:{Beginner:"1–2×/week on the T-zone",Intermediate:"3×/week or daily on oily zones",Advanced:"Daily if no dryness — watch the barrier"},
+  pairs:["niacinamide","ha"],clash:["retinoids","aha"],
+  tip:"A BHA liquid on just the T-zone lets dry cheeks stay in peace — zone-targeting beats full-face."},
+aha:{name:"Glycolic / Lactic Acid (AHA)",emoji:"✨",cat:"Exfoliant",color:"#D08B2C",
+  blurb:"Surface exfoliants for glow — dissolve dull, dead cells and fade post-blemish marks.",
+  what:"AHAs loosen the bonds holding dead cells on the surface, revealing brighter skin, softening rough texture and gradually fading pigmentation. Glycolic is the strongest and smallest molecule; lactic is gentler and hydrating; mandelic is the mildest.",
+  bestFor:["Dullness","Rough texture","Uneven tone & sun damage","Normal to oily, resilient skin"],
+  avoid:["Sensitive or barrier-damaged skin","Layering with retinoids the same night","Skipping SPF — AHAs raise sun sensitivity"],
+  am:false,pm:true,
+  freq:{Beginner:"1×/week (lactic 5%)",Intermediate:"2×/week",Advanced:"2–3×/week, never nightly"},
+  pairs:["ha","ceramides"],clash:["retinoids","bha","vitc"],
+  tip:"More acid ≠ more glow. Over-exfoliation is the most common self-inflicted skin injury."},
+azelaic:{name:"Azelaic Acid",emoji:"🌾",cat:"Brightening",color:"#B7695C",
+  blurb:"The quiet multitasker: redness, rosacea-prone skin, acne and dark marks — with almost no irritation.",
+  what:"Azelaic acid calms redness, kills acne bacteria, unclogs pores and blocks the enzyme that overproduces pigment — making it superb for post-acne marks and melasma. It's one of the few actives considered safe in pregnancy.",
+  bestFor:["Redness & rosacea-prone skin","Acne + dark marks together","Sensitive skin needing results","Pregnancy-safe routines"],
+  avoid:["Very rare allergy — patch test as always"],
+  am:true,pm:true,
+  freq:{Beginner:"Once daily",Intermediate:"Twice daily",Advanced:"Twice daily under other actives"},
+  pairs:["niacinamide","ha","retinoids"],clash:[],
+  tip:"Underrated. If retinoids and acids are too much for your skin, azelaic is usually the answer."},
+niacinamide:{name:"Niacinamide (Vitamin B3)",emoji:"🧈",cat:"Barrier",color:"#5F8F5F",
+  blurb:"Oil control + barrier strength + tone evening, all in one calm ingredient.",
+  what:"Niacinamide regulates sebum production, strengthens the barrier by boosting ceramide synthesis, reduces the look of enlarged pores, and interrupts pigment transfer for a more even tone. It plays well with nearly everything.",
+  bestFor:["Oily & combination skin","Enlarged pores","Uneven tone","Anyone building barrier strength"],
+  avoid:["Very high % (20%+) can flush sensitive skin — 4–10% is the sweet spot"],
+  am:true,pm:true,
+  freq:{Beginner:"Once daily",Intermediate:"Twice daily",Advanced:"Twice daily"},
+  pairs:["retinoids","bha","vitc","ha"],clash:[],
+  tip:"The 'niacinamide clashes with vitamin C' rumour is a 1960s-era myth — modern formulas combine them safely."},
+vitc:{name:"Vitamin C (Ascorbic Acid)",emoji:"🍊",cat:"Brightening",color:"#E0912F",
+  blurb:"Morning antioxidant shield — brightens, fades dark spots, and boosts your SPF's defence.",
+  what:"Vitamin C neutralises the free radicals generated by UV and pollution, fades dark spots by slowing pigment production, and supports collagen synthesis. Worn under sunscreen in the morning, the pair protects better than either alone.",
+  bestFor:["Dark spots & uneven tone","Dullness","First signs of ageing","City / high-UV living"],
+  avoid:["Reactive skin may prefer gentler derivatives (SAP, ethylated C)","Layering with strong acids the same morning"],
+  am:true,pm:false,
+  freq:{Beginner:"3×/week, 10% derivative",Intermediate:"Daily AM",Advanced:"Daily AM, 15–20% L-ascorbic"},
+  pairs:["spf","ha","niacinamide"],clash:["aha"],
+  tip:"If your L-ascorbic serum turns dark orange-brown, it has oxidised — replace it."},
+ha:{name:"Hyaluronic Acid",emoji:"💧",cat:"Hydration",color:"#3FA7B7",
+  blurb:"A moisture magnet holding up to 1000× its weight in water — instant plumping for dehydrated skin.",
+  what:"Hyaluronic acid is a humectant that draws water into the upper skin layers, instantly plumping fine dehydration lines and giving all skin types (including oily) weightless hydration. Multi-weight formulas hydrate at several depths.",
+  bestFor:["Dehydrated skin of any type","Fine dehydration lines","Plumping under makeup","Buffering stronger actives"],
+  avoid:["In very dry climates, always seal it with moisturiser — or it can pull water out of skin"],
+  am:true,pm:true,
+  freq:{Beginner:"Daily",Intermediate:"Twice daily",Advanced:"Twice daily"},
+  pairs:["retinoids","vitc","aha","bha","ceramides"],clash:[],
+  tip:"Apply to damp skin and seal with moisturiser within a minute — that's the whole trick."},
+ceramides:{name:"Ceramides",emoji:"🧱",cat:"Barrier",color:"#A98253",
+  blurb:"The mortar between your skin cells. Rebuilds the barrier, ends the sensitivity spiral.",
+  what:"Ceramides are lipids that make up ~50% of your skin barrier. Topping them up repairs the 'mortar' between cells, locking moisture in and irritants out — reducing redness, stinging, tightness and reactivity.",
+  bestFor:["Dry & sensitive skin","Barrier damage & over-exfoliation recovery","Eczema-prone skin","Everyone using retinoids or acids"],
+  avoid:["No meaningful cautions — this is the safest category in skincare"],
+  am:true,pm:true,
+  freq:{Beginner:"Daily",Intermediate:"Twice daily",Advanced:"Twice daily"},
+  pairs:["retinoids","aha","bha","ha"],clash:[],
+  tip:"If skin stings when you apply plain moisturiser, stop all actives and run 2 weeks of ceramides only."},
+peptides:{name:"Peptides",emoji:"🧬",cat:"Firming",color:"#8B6BAA",
+  blurb:"Chains of amino acids that whisper 'make more collagen' to your skin — firmness without irritation.",
+  what:"Peptides are messenger molecules: signal peptides nudge fibroblasts to produce collagen and elastin, while carrier and neurotransmitter-inhibiting peptides support firmness and soften expression lines. Zero irritation makes them ideal for eyes, neck and sensitive skin.",
+  bestFor:["Loss of firmness","Eye-area lines & crepiness","Sensitive skin that can't take retinoids","Layering with anything"],
+  avoid:["Direct layering with strong acids may reduce their efficacy — separate by routine"],
+  am:true,pm:true,
+  freq:{Beginner:"Daily",Intermediate:"Twice daily",Advanced:"Twice daily"},
+  pairs:["ha","niacinamide","ceramides","retinoids"],clash:["aha"],
+  tip:"Peptides are a marathon ingredient — judge them at 12 weeks, not 12 days."},
+caffeine:{name:"Caffeine",emoji:"☕",cat:"Eye care",color:"#6E5643",
+  blurb:"Constricts vessels and moves fluid — the fastest visible fix for puffiness and tired eyes.",
+  what:"Applied topically, caffeine constricts blood vessels and encourages fluid drainage, visibly reducing morning puffiness and the bluish tint of vascular dark circles. Paired with EGCG (green tea), it also calms and protects.",
+  bestFor:["Puffy morning eyes","Vascular (bluish) dark circles","Tired-looking skin","Pre-event de-puffing"],
+  avoid:["Won't fix brown (pigment) circles — that needs vitamin C/azelaic — or hollow-shadow circles"],
+  am:true,pm:false,
+  freq:{Beginner:"Every morning",Intermediate:"Every morning",Advanced:"AM + before events"},
+  pairs:["peptides","ha","vitc"],clash:[],
+  tip:"Keep it in the fridge — the cold roller-ball effect does half the de-puffing work."},
+bakuchiol:{name:"Bakuchiol",emoji:"🌿",cat:"Renewal",color:"#4F8A6B",
+  blurb:"The plant-derived retinol alternative — similar smoothing signals, none of the flaking.",
+  what:"Bakuchiol activates some of the same collagen and turnover pathways as retinol without binding retinoid receptors, so it smooths texture and fine lines with minimal irritation. Trials show comparable wrinkle improvement to 0.5% retinol at 12 weeks, with better tolerance.",
+  bestFor:["Sensitive skin wanting anti-ageing","Retinoid-intolerant skin","Daytime use (not photo-unstable)","Pregnancy routines (evidence limited — confirm with your doctor)"],
+  avoid:["Evidence base is younger than retinol's — expectations accordingly"],
+  am:true,pm:true,
+  freq:{Beginner:"Once daily",Intermediate:"Twice daily",Advanced:"Twice daily or paired with retinol nights"},
+  pairs:["ha","peptides","niacinamide"],clash:[],
+  tip:"A genuine option if retinoids always end in a flaky mess — or alongside them on 'off' nights."},
+centella:{name:"Centella Asiatica (Cica)",emoji:"🍃",cat:"Soothing",color:"#5E9E77",
+  blurb:"The fire extinguisher — calms redness, stinging and angry skin fast.",
+  what:"Centella asiatica (tiger grass) compounds — madecassoside, asiaticoside — calm inflammation, speed barrier recovery and reduce redness. It's the go-to during retinoid adjustment, after over-exfoliation, or for perpetually reactive skin.",
+  bestFor:["Redness & reactivity","Retinoid-adjustment weeks","Post-procedure or sunburned skin","Sensitive-skin baseline routines"],
+  avoid:["No meaningful cautions"],
+  am:true,pm:true,
+  freq:{Beginner:"As needed",Intermediate:"Daily",Advanced:"Daily under actives"},
+  pairs:["retinoids","aha","bha","ceramides"],clash:[],
+  tip:"Great 'buffer' layer: centella first, retinoid on top slows penetration just enough for comfort."},
+squalane:{name:"Squalane",emoji:"🫒",cat:"Hydration",color:"#93A554",
+  blurb:"A weightless, skin-identical oil that softens and seals without ever clogging.",
+  what:"Squalane mimics your skin's own squalene, softening rough patches and sealing in hydration with a dry, non-greasy finish. It's non-comedogenic, fragrance-free by nature and tolerated by essentially everyone — including oily and acne-prone skin.",
+  bestFor:["Dry patches on any skin type","Sealing hyaluronic acid","Buffering retinoids","Oily skin that fears face oils"],
+  avoid:["No meaningful cautions"],
+  am:true,pm:true,
+  freq:{Beginner:"As needed",Intermediate:"Nightly last step",Advanced:"AM + PM last step"},
+  pairs:["ha","retinoids","ceramides"],clash:[],
+  tip:"Two drops pressed over moisturiser at night = cheap, reliable 'slugging lite'."},
+spf:{name:"Sunscreen (SPF 30–50)",emoji:"☀️",cat:"Protection",color:"#D9A32C",
+  blurb:"Not optional. The single highest-return product in any routine — every result above depends on it.",
+  what:"UV drives up to 80–90% of visible skin ageing and every form of pigmentation. Daily broad-spectrum SPF 30–50 protects the collagen your retinoids build and stops the dark spots your vitamin C fades from coming straight back. No SPF, no point.",
+  bestFor:["Every skin type","Every age","Every climate, every season","Anyone using acids or retinoids (non-negotiable)"],
+  avoid:["Nothing. Reapply every 2–3 hours in direct sun"],
+  am:true,pm:false,
+  freq:{Beginner:"Every morning, ¼ tsp for face",Intermediate:"Every morning + reapply",Advanced:"Every morning + reapply"},
+  pairs:["vitc","niacinamide"],clash:[],
+  tip:"The best sunscreen is the one you'll actually wear daily — texture matters more than the number."}
+};
+
+/* =================== PRODUCTS =================== */
+const PRODUCTS = [
+{id:"pc-bha",name:"Skin Perfecting 2% BHA Liquid Exfoliant",brand:"Paula's Choice",active:"bha",price:"$$",priceNote:"NZ$20–65",rating:4.6,reviews:"Cult status for blackheads; a little goes a long way",pop:98,types:["Oily","Combination","Normal"],bestFor:"Blackheads · pores · texture",derm:9.5,evid:9,val:7.5,retail:["Sephora","Adore Beauty","Paula's Choice","Amazon"]},
+{id:"cosrx-bha",name:"BHA Blackhead Power Liquid",brand:"COSRX",active:"bha",price:"$",priceNote:"NZ$25–35",rating:4.4,reviews:"Gentle 4% betaine salicylate — great BHA starter",pop:88,types:["Oily","Combination","Sensitive"],bestFor:"First BHA · gentle decongesting",derm:8,evid:7.5,val:9,retail:["YesStyle","Amazon","Stylevana"]},
+{id:"to-bha",name:"Salicylic Acid 2% Solution",brand:"The Ordinary",active:"bha",price:"$",priceNote:"NZ$14–20",rating:4.2,reviews:"No-frills effective BHA at pocket money price",pop:85,types:["Oily","Combination"],bestFor:"Budget T-zone control",derm:7.5,evid:8,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"lrp-hyalu",name:"Hyalu B5 Serum",brand:"La Roche-Posay",active:"ha",price:"$$",priceNote:"NZ$65–90",rating:4.5,reviews:"HA + B5 combo loved by sensitive and post-procedure skin",pop:90,types:["All","Sensitive","Dry"],bestFor:"Plumping · barrier comfort",derm:9,evid:8,val:7,retail:["Chemist Warehouse","Amazon","Adore Beauty"]},
+{id:"to-ha",name:"Hyaluronic Acid 2% + B5",brand:"The Ordinary",active:"ha",price:"$",priceNote:"NZ$15–22",rating:4.3,reviews:"Multi-weight HA, unbeatable value",pop:92,types:["All"],bestFor:"Budget daily hydration",derm:7.5,evid:7.5,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"vichy-89",name:"Minéral 89 Booster",brand:"Vichy",active:"ha",price:"$$",priceNote:"NZ$50–70",rating:4.5,reviews:"Featherweight gel; the 'skin drink' texture people finish",pop:87,types:["All","Sensitive"],bestFor:"Layering under everything",derm:8.5,evid:7.5,val:7,retail:["Chemist Warehouse","Amazon","Life Pharmacy"]},
+{id:"cerave-cream",name:"Moisturising Cream",brand:"CeraVe",active:"ceramides",price:"$",priceNote:"NZ$20–35",rating:4.7,reviews:"3 ceramides + MVE tech; dermatologists' default answer",pop:97,types:["Dry","Sensitive","Normal"],bestFor:"Barrier repair · body + face",derm:9.5,evid:8.5,val:9.5,retail:["Chemist Warehouse","Amazon","Countdown"]},
+{id:"drjart-ceramidin",name:"Ceramidin Cream",brand:"Dr.Jart+",active:"ceramides",price:"$$",priceNote:"NZ$70–90",rating:4.5,reviews:"Rich, cushiony ceramide hit for stressed skin",pop:82,types:["Dry","Sensitive"],bestFor:"Winter barrier rescue",derm:8,evid:7.5,val:6.5,retail:["Sephora","YesStyle","Amazon"]},
+{id:"to-caffeine",name:"Caffeine Solution 5% + EGCG",brand:"The Ordinary",active:"caffeine",price:"$",priceNote:"NZ$16–23",rating:4.1,reviews:"Visible de-puffing; keep it in the fridge",pop:89,types:["All"],bestFor:"Puffiness · vascular dark circles",derm:7.5,evid:7,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"murad-eye",name:"Retinol Youth Renewal Eye Serum",brand:"Murad",active:"retinoids",price:"$$$",priceNote:"NZ$130–160",rating:4.4,reviews:"Tri-retinoid blend engineered for the eye area",pop:75,types:["Normal","Mature"],bestFor:"Crow's feet · eye-area lines",derm:8.5,evid:8,val:5.5,retail:["Sephora","Dermstore","Adore Beauty"]},
+{id:"roc-eye",name:"Retinol Correxion Eye Cream",brand:"RoC",active:"retinoids",price:"$$",priceNote:"NZ$40–55",rating:4.3,reviews:"Decades of clinical receipts at a drugstore price",pop:83,types:["Normal","Mature"],bestFor:"First retinol eye cream",derm:8.5,evid:8.5,val:8.5,retail:["Amazon","iHerb","Ulta"]},
+{id:"de-eye",name:"Protini Powerpeptide Eye Cream",brand:"Drunk Elephant",active:"peptides",price:"$$$",priceNote:"NZ$105–125",rating:4.2,reviews:"Peptide-dense, silky, plays well under concealer",pop:78,types:["All","Sensitive"],bestFor:"Firmness without irritation",derm:7.5,evid:7,val:5.5,retail:["Sephora","MECCA","Cult Beauty"]},
+{id:"medik8-eye",name:"Crystal Retinal Ceramide Eye",brand:"Medik8",active:"retinoids",price:"$$$",priceNote:"NZ$110–135",rating:4.6,reviews:"Retinal + ceramides — potent yet cushioned",pop:80,types:["Normal","Mature","Sensitive"],bestFor:"Serious eye renewal, gentler ride",derm:9,evid:8.5,val:6,retail:["Adore Beauty","Cult Beauty","Dermstore"]},
+{id:"differin",name:"Adapalene Gel 0.1%",brand:"Differin",active:"retinoids",price:"$",priceNote:"NZ$25–40",rating:4.5,reviews:"OTC prescription-grade retinoid; the acne game-changer",pop:93,types:["Oily","Acne-prone","Combination"],bestFor:"Acne + texture + anti-ageing in one",derm:9.5,evid:9.5,val:9,retail:["Amazon","iHerb","Pharmacy"]},
+{id:"medik8-cr",name:"Crystal Retinal 3",brand:"Medik8",active:"retinoids",price:"$$$",priceNote:"NZ$95–120",rating:4.7,reviews:"Retinal ladder system — results ~11× faster than retinol claims",pop:86,types:["Normal","Mature","Dry"],bestFor:"Progressive strength anti-ageing",derm:9,evid:8.5,val:6.5,retail:["Adore Beauty","Cult Beauty","MECCA"]},
+{id:"sc-retinol",name:"Retinol 0.5 Refining Night Cream",brand:"SkinCeuticals",active:"retinoids",price:"$$$",priceNote:"NZ$120–150",rating:4.4,reviews:"Stabilised, slow-release retinol from the clinical house",pop:72,types:["Normal","Mature"],bestFor:"Dermatology-clinic pedigree",derm:9,evid:8.5,val:5.5,retail:["Dermstore","SkinCeuticals","Adore Beauty"]},
+{id:"to-ret",name:"Retinal 0.2% Emulsion",brand:"The Ordinary",active:"retinoids",price:"$",priceNote:"NZ$25–35",rating:4.3,reviews:"Potent retinal at an entry price — respect the adjustment period",pop:84,types:["Normal","Combination"],bestFor:"Budget serious retinoid",derm:7.5,evid:8,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"neut-rwr",name:"Rapid Wrinkle Repair Regenerating Cream",brand:"Neutrogena",active:"retinoids",price:"$$",priceNote:"NZ$45–60",rating:4.2,reviews:"Accessible retinol + HA cream; good for neck & décolletage",pop:81,types:["Normal","Dry","Mature"],bestFor:"Face + neck retinol on a budget",derm:8,evid:8,val:8,retail:["Amazon","Chemist Warehouse","Ulta"]},
+{id:"sc-cef",name:"C E Ferulic",brand:"SkinCeuticals",active:"vitc",price:"$$$",priceNote:"NZ$240–290",rating:4.7,reviews:"The most-cited vitamin C formula in dermatology literature",pop:91,types:["Normal","Dry","Mature"],bestFor:"Gold-standard brightening & protection",derm:10,evid:9.5,val:4.5,retail:["Dermstore","SkinCeuticals","Adore Beauty"]},
+{id:"timeless-c",name:"20% Vitamin C + E Ferulic Serum",brand:"Timeless",active:"vitc",price:"$",priceNote:"NZ$40–55",rating:4.4,reviews:"The famous 'CEF dupe' — same trio, fraction of the price",pop:79,types:["Normal","Oily"],bestFor:"CEF results on a budget",derm:7.5,evid:8,val:9.5,retail:["Amazon","iHerb","Timeless"]},
+{id:"lrp-c10",name:"Pure Vitamin C10 Serum",brand:"La Roche-Posay",active:"vitc",price:"$$",priceNote:"NZ$70–90",rating:4.4,reviews:"10% vitamin C formulated for sensitive skin",pop:80,types:["Sensitive","Normal","Dry"],bestFor:"Vitamin C for reactive skin",derm:8.5,evid:8,val:7,retail:["Chemist Warehouse","Amazon","Adore Beauty"]},
+{id:"to-niac",name:"Niacinamide 10% + Zinc 1%",brand:"The Ordinary",active:"niacinamide",price:"$",priceNote:"NZ$12–18",rating:4.3,reviews:"The best-selling serum on earth; oil control workhorse",pop:99,types:["Oily","Combination","Acne-prone"],bestFor:"Oil + pores on a budget",derm:8,evid:8,val:10,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"pc-niac",name:"10% Niacinamide Booster",brand:"Paula's Choice",active:"niacinamide",price:"$$$",priceNote:"NZ$85–105",rating:4.5,reviews:"Elegant texture, refined pore results by week 4",pop:76,types:["All","Combination"],bestFor:"Pores · tone · barrier",derm:9,evid:8.5,val:6,retail:["Paula's Choice","Sephora","Adore Beauty"]},
+{id:"to-glyc",name:"Glycolic Acid 7% Toner",brand:"The Ordinary",active:"aha",price:"$",priceNote:"NZ$18–25",rating:4.4,reviews:"Weekly glow ritual; do not use nightly",pop:90,types:["Normal","Oily","Combination"],bestFor:"Dullness · texture · value",derm:7.5,evid:8,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"pixi-glow",name:"Glow Tonic 5% Glycolic",brand:"Pixi",active:"aha",price:"$$",priceNote:"NZ$35–50",rating:4.3,reviews:"Gentler daily-ish glow toner with aloe",pop:84,types:["Normal","Combination"],bestFor:"Beginner AHA glow",derm:7,evid:7,val:7.5,retail:["MECCA","Cult Beauty","Amazon"]},
+{id:"to-lactic",name:"Lactic Acid 5% + HA",brand:"The Ordinary",active:"aha",price:"$",priceNote:"NZ$14–20",rating:4.3,reviews:"The gentlest way into acids — hydrating while it polishes",pop:82,types:["Dry","Sensitive","Normal"],bestFor:"Sensitive-skin exfoliation",derm:7.5,evid:7.5,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"to-azelaic",name:"Azelaic Acid Suspension 10%",brand:"The Ordinary",active:"azelaic",price:"$",priceNote:"NZ$16–24",rating:4.2,reviews:"Redness + marks tamed for under $25",pop:81,types:["Sensitive","Combination","Acne-prone"],bestFor:"Budget redness & marks",derm:8,evid:8.5,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"pc-azelaic",name:"10% Azelaic Acid Booster",brand:"Paula's Choice",active:"azelaic",price:"$$$",priceNote:"NZ$80–100",rating:4.5,reviews:"Azelaic + salicylic + licorice — pigment triple play",pop:74,types:["All","Sensitive"],bestFor:"Stubborn post-acne marks",derm:9,evid:8.5,val:6,retail:["Paula's Choice","Sephora","Adore Beauty"]},
+{id:"to-peptides",name:"Multi-Peptide + HA Serum ('Buffet')",brand:"The Ordinary",active:"peptides",price:"$$",priceNote:"NZ$30–40",rating:4.2,reviews:"Broad peptide cocktail, painless entry to firming",pop:85,types:["All"],bestFor:"Budget multi-peptide",derm:7,evid:6.5,val:9,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"de-protini",name:"Protini Polypeptide Cream",brand:"Drunk Elephant",active:"peptides",price:"$$$",priceNote:"NZ$120–140",rating:4.4,reviews:"9 peptides in a bouncy moisturiser; visible spring-back",pop:83,types:["All","Mature"],bestFor:"Peptide moisturiser upgrade",derm:8,evid:7,val:5.5,retail:["Sephora","MECCA","Cult Beauty"]},
+{id:"inkey-bak",name:"Bakuchiol Moisturizer",brand:"The INKEY List",active:"bakuchiol",price:"$",priceNote:"NZ$20–28",rating:4.2,reviews:"Plant-retinol starter with squalane and sacha inchi",pop:70,types:["Sensitive","Dry","Normal"],bestFor:"Retinol-free renewal",derm:7,evid:6.5,val:9,retail:["Sephora","Cult Beauty","Amazon"]},
+{id:"skin1004-cica",name:"Madagascar Centella Ampoule",brand:"SKIN1004",active:"centella",price:"$",priceNote:"NZ$25–35",rating:4.6,reviews:"Single-minded redness rescue; K-beauty staple",pop:86,types:["Sensitive","All"],bestFor:"Calming reactive skin",derm:7.5,evid:7,val:9,retail:["YesStyle","Amazon","Stylevana"]},
+{id:"lrp-cica",name:"Cicaplast Baume B5+",brand:"La Roche-Posay",active:"centella",price:"$",priceNote:"NZ$25–40",rating:4.7,reviews:"The barrier-rescue balm dermatologists keep in their own bags",pop:94,types:["Sensitive","Dry","All"],bestFor:"SOS repair · retinoid burn",derm:9.5,evid:8,val:9,retail:["Chemist Warehouse","Amazon","Adore Beauty"]},
+{id:"to-squalane",name:"100% Plant-Derived Squalane",brand:"The Ordinary",active:"squalane",price:"$",priceNote:"NZ$15–22",rating:4.4,reviews:"One ingredient, endless uses — face, hair, cuticles",pop:80,types:["All"],bestFor:"Sealing · softening · buffering",derm:7.5,evid:7,val:9.5,retail:["Sephora","Adore Beauty","Amazon"]},
+{id:"lrp-uvmune",name:"Anthelios UVMune 400 Invisible Fluid SPF50+",brand:"La Roche-Posay",active:"spf",price:"$$",priceNote:"NZ$40–55",rating:4.7,reviews:"Best-in-class UVA filter tech; invisible on skin",pop:95,types:["All","Sensitive"],bestFor:"Daily gold-standard protection",derm:10,evid:9.5,val:8,retail:["Chemist Warehouse","Amazon","Adore Beauty"]},
+{id:"boj-sun",name:"Relief Sun: Rice + Probiotics SPF50+",brand:"Beauty of Joseon",active:"spf",price:"$",priceNote:"NZ$25–35",rating:4.7,reviews:"The sunscreen that converted the SPF-haters — feels like moisturiser",pop:96,types:["All","Dry","Sensitive"],bestFor:"SPF you'll actually wear",derm:8.5,evid:8,val:9.5,retail:["YesStyle","Amazon","Stylevana"]},
+{id:"elta-uv",name:"UV Clear SPF 46",brand:"EltaMD",active:"spf",price:"$$$",priceNote:"NZ$75–95",rating:4.7,reviews:"Niacinamide + zinc SPF beloved for acne-prone skin",pop:88,types:["Oily","Acne-prone","Sensitive"],bestFor:"SPF for breakout-prone skin",derm:9.5,evid:8.5,val:6.5,retail:["Dermstore","Amazon","EltaMD"]},
+{id:"sc-tlr",name:"Triple Lipid Restore 2:4:2",brand:"SkinCeuticals",active:"ceramides",price:"$$$",priceNote:"NZ$230–270",rating:4.6,reviews:"Precise ceramide:cholesterol:fatty-acid ratio for mature barrier",pop:73,types:["Mature","Dry"],bestFor:"Mature skin · neck & décolletage",derm:9.5,evid:8.5,val:4.5,retail:["Dermstore","SkinCeuticals","Adore Beauty"]},
+{id:"laneige-lip",name:"Lip Sleeping Mask",brand:"Laneige",active:"ceramides",price:"$$",priceNote:"NZ$30–40",rating:4.6,reviews:"Overnight lip transformation; the berry one is iconic",pop:92,types:["All"],bestFor:"Overnight lip repair",derm:7.5,evid:6.5,val:7.5,retail:["Sephora","MECCA","YesStyle"]},
+{id:"aquaphor",name:"Healing Ointment",brand:"Aquaphor",active:"ceramides",price:"$",priceNote:"NZ$15–25",rating:4.7,reviews:"Petrolatum-based do-everything; lips, slugging, retinoid buffer",pop:93,types:["All","Dry"],bestFor:"Cracked lips · sealing",derm:9,evid:8,val:9.5,retail:["Amazon","iHerb","Chemist Warehouse"]},
+{id:"vaseline-lip",name:"Lip Therapy",brand:"Vaseline",active:"ceramides",price:"$",priceNote:"NZ$4–8",rating:4.5,reviews:"Pure occlusive protection for pennies",pop:85,types:["All"],bestFor:"Simple lip sealing",derm:8,evid:7.5,val:10,retail:["Countdown","Chemist Warehouse","Amazon"]},
+{id:"cerave-foam",name:"Foaming Facial Cleanser",brand:"CeraVe",active:"niacinamide",price:"$",priceNote:"NZ$20–30",rating:4.5,reviews:"Cleans oily skin without stripping; ceramides included",pop:91,types:["Oily","Combination","Normal"],bestFor:"AM/PM cleanse for oilier skin",derm:9,evid:7.5,val:9.5,retail:["Chemist Warehouse","Amazon","Countdown"]},
+{id:"cerave-hydrating",name:"Hydrating Facial Cleanser",brand:"CeraVe",active:"ceramides",price:"$",priceNote:"NZ$20–30",rating:4.6,reviews:"The no-drama cleanser for dry and sensitive skin",pop:92,types:["Dry","Sensitive","Normal"],bestFor:"Gentle AM/PM cleanse",derm:9,evid:7.5,val:9.5,retail:["Chemist Warehouse","Amazon","Countdown"]}
+];
+function prodScore(p){const r=(p.rating-3.5)/1.5*10;return Math.round((p.derm*.28+p.evid*.22+r*.2+p.val*.15+p.pop/10*.15)*10)/10}
+PRODUCTS.forEach(p=>p.score=prodScore(p));
+
+/* =================== ZONES =================== */
+const ZONES = {
+forehead:{name:"Forehead",emoji:"🧠",analysis:"A high-sebum zone with thin, expressive skin. Watch for: oil production, congestion along the hairline (check your haircare!), horizontal expression lines, and texture.",
+ concerns:["Oil & shine","Texture / bumps","Fine lines","Hairline breakouts"],
+ actives:[{id:"niacinamide",why:"Regulates sebum and smooths the look of uneven texture"},{id:"bha",why:"Clears the fine congestion ('forehead bumps') that pore-strips can't touch"},{id:"retinoids",why:"Softens horizontal expression lines over 8–12 weeks"},{id:"peptides",why:"Firms and supports the expressive muscles' constant fold-lines"}],
+ prods:["to-niac","pc-bha","medik8-cr","to-peptides"]},
+tzone:{name:"T-Zone (forehead · nose · chin)",emoji:"⛰️",analysis:"The oil headquarters. More sebaceous glands per cm² than anywhere else on your face — hence the shine by noon, blackheads on the nose, and enlarged pores.",
+ concerns:["Oiliness & shine","Sebum & blackheads","Enlarged pores","Midday breakthrough"],
+ actives:[{id:"bha",why:"Oil-soluble: removes oil inside pores, reduces blackheads, improves texture"},{id:"niacinamide",why:"Dial down the sebum tap itself and tighten the look of pores"}],
+ prods:["pc-bha","cosrx-bha","to-bha","to-niac"]},
+nose:{name:"Nose",emoji:"👃",analysis:"Maximum pore density and constant oil flow. Those grey dots are mostly sebaceous filaments (normal!) — true blackheads are darker, raised plugs.",
+ concerns:["Blackheads","Sebaceous filaments","Redness at the sides","Flaking on the bridge"],
+ actives:[{id:"bha",why:"The only active that dissolves plugs inside the pore"},{id:"azelaic",why:"Calms the red creases at the nose's sides (a classic seb-derm spot)"}],
+ prods:["cosrx-bha","pc-bha","to-azelaic"]},
+undereyes:{name:"Under Eyes",emoji:"👁️",analysis:"The thinnest skin on your body (~0.5mm) — first to show dehydration, fatigue and ageing. Dark circles come in three types: vascular (bluish), pigmented (brown), and structural (shadowed hollows) — each needs a different fix.",
+ concerns:["Dark circles","Puffiness / eye bags","Crow's feet & fine lines","Dryness & crepiness"],
+ actives:[{id:"caffeine",why:"Reduces puffiness and improves tired, bluish appearance"},{id:"retinoids",why:"Eye-specific retinal/retinol for crow's feet and collagen support"},{id:"peptides",why:"Firmness and elasticity without irritating this fragile zone"}],
+ prods:["to-caffeine","medik8-eye","murad-eye","roc-eye","de-eye"]},
+cheeks:{name:"Cheeks",emoji:"🍑",analysis:"Fewer oil glands, more exposure — the cheeks run dry, flush easily and catch the most UV. This is where dehydration, redness and pigmentation show first.",
+ concerns:["Dryness & tightness","Redness / flushing","Pigmentation & sun spots","Sensitivity"],
+ actives:[{id:"ha",why:"Deep hydration and plumping for the driest zone of the face"},{id:"ceramides",why:"Repair the barrier, reduce reactivity and flushing"},{id:"azelaic",why:"Targets redness and cheek pigmentation in one gentle step"}],
+ prods:["lrp-hyalu","to-ha","vichy-89","cerave-cream","drjart-ceramidin","to-azelaic"]},
+smile:{name:"Smile Lines / Around Mouth",emoji:"😊",analysis:"Nasolabial folds deepen with volume loss and collagen decline; the surrounding skin is also prone to dryness. Topicals soften surface lines and texture — deep folds are structural.",
+ concerns:["Fine lines","Dryness","Loss of elasticity","Lipstick-bleed lines"],
+ actives:[{id:"retinoids",why:"Collagen stimulation — the best-evidenced topical for lines"},{id:"peptides",why:"Support elasticity between retinoid nights"},{id:"ha",why:"Plump the dehydration component of the fold instantly"}],
+ prods:["differin","medik8-cr","sc-retinol","de-protini","lrp-hyalu"]},
+lips:{name:"Lips",emoji:"👄",analysis:"No oil glands, minimal melanin, constant movement — lips lose moisture 3× faster than facial skin. Chronic cracking usually means licking, dehydration or missing SPF.",
+ concerns:["Dryness & cracking","Pigmentation","Flaking","Thinning with age"],
+ actives:[{id:"ceramides",why:"Petrolatum, ceramides & shea butter seal and repair the lip barrier"},{id:"spf",why:"Lips burn easily and age visibly — SPF lip balm by day"}],
+ prods:["laneige-lip","aquaphor","vaseline-lip"]},
+chin:{name:"Chin & Jawline",emoji:"🫤",analysis:"The hormonal zone — cyclical, deep, tender breakouts cluster here. Also collects congestion from phones, chin-resting and helmet straps.",
+ concerns:["Hormonal breakouts","Congestion","Post-blemish marks","Texture"],
+ actives:[{id:"bha",why:"Keeps pores clear between hormonal flares"},{id:"azelaic",why:"Calms active spots and fades the marks they leave"},{id:"retinoids",why:"Adapalene is the evidence king for recurring acne"}],
+ prods:["differin","to-azelaic","pc-azelaic","pc-bha"]},
+neck:{name:"Neck & Décolletage",emoji:"🦢",analysis:"Thin skin, few oil glands, decades of forgotten sunscreen. Shows ageing fast — but responds beautifully once you simply extend your routine downwards.",
+ concerns:["Crepiness & firmness","Sun damage","Horizontal 'tech neck' lines","Uneven tone"],
+ actives:[{id:"retinoids",why:"Start 2 nights/week — neck skin is less tolerant than face"},{id:"peptides",why:"Firming support with zero irritation risk"},{id:"spf",why:"Non-negotiable: the #1 anti-ageing step for this zone"}],
+ prods:["neut-rwr","medik8-cr","sc-tlr","lrp-uvmune"]}
+};
+
+/* =================== CONFLICTS =================== */
+const CONFLICTS = [
+{a:"retinoids",b:"aha",sev:"high",why:"Both accelerate exfoliation — together in one night they routinely cause barrier damage, stinging and flaking.",fix:"Alternate nights: retinoid Mon/Thu, AHA Wed or Sat. Never stack while adapting."},
+{a:"retinoids",b:"bha",sev:"high",why:"Layering a retinoid over salicylic acid multiplies irritation with little added benefit.",fix:"BHA in the morning or on non-retinoid nights; zone-target BHA to the T-zone."},
+{a:"aha",b:"bha",sev:"med",why:"Two exfoliating acids in one routine = over-exfoliation risk: shiny-tight skin, redness, breakouts.",fix:"Pick one per routine. If you need both, AHA 1–2 nights/week and BHA on separate days."},
+{a:"vitc",b:"aha",sev:"med",why:"L-ascorbic acid is already at low pH; adding glycolic/lactic compounds irritation on many skins.",fix:"Vitamin C in the AM, AHA at night on retinoid-free evenings."},
+{a:"vitc",b:"bha",sev:"low",why:"Usually tolerable, but sensitive skin may sting when both are used in the same routine.",fix:"Vitamin C AM, BHA PM — or alternate mornings."},
+{a:"retinoids",b:"vitc",sev:"low",why:"Not dangerous — just different pH optima and stacked irritation potential.",fix:"The classic split: vitamin C every morning under SPF, retinoid at night."},
+{a:"aha",b:"peptides",sev:"low",why:"Low pH may destabilise some peptide bonds, blunting their benefit.",fix:"Use peptides in the routine that doesn't contain your acid."},
+{a:"retinoids",b:"retinoids",sev:"high",why:"Two retinoid products (e.g. serum + eye cream + moisturiser) can silently stack the dose.",fix:"Count every retinoid-containing product as one dose. One per night."},
+{a:"aha",b:"aha",sev:"med",why:"Multiple AHA products (toner + serum + mask) is the fastest route to a wrecked barrier.",fix:"One exfoliating product per routine, max 2–3 uses per week."},
+{a:"niacinamide",b:"vitc",sev:"none",why:"Old myth from 1960s unstabilised formulas. Modern niacinamide + vitamin C are fine together — even complementary for pigment.",fix:"No change needed. Layer thinnest to thickest."}
+];
+
+/* =================== QUIZ =================== */
+const QUIZ = [
+{id:"age",title:"How old is your skin?",sub:"Life stage shapes which actives earn a place — collagen production drops ~1% a year from our mid-20s.",multi:false,opts:[
+ {v:"under20",i:"🌱",b:"Under 20",s:"Focus: gentle care + SPF habits"},{v:"20s",i:"🌿",b:"20s",s:"Focus: prevention & barrier"},{v:"30s",i:"🌾",b:"30s",s:"Focus: first lines, early actives"},{v:"40s",i:"🌻",b:"40s",s:"Focus: collagen support"},{v:"50s",i:"🌺",b:"50s",s:"Focus: firmness & density"},{v:"60plus",i:"🌹",b:"60+",s:"Focus: barrier & comfort"}]},
+{id:"gender",title:"How do you identify?",sub:"Optional — hormones influence oil production and breakout patterns, nothing more.",multi:false,optional:true,opts:[
+ {v:"female",i:"♀",b:"Female"},{v:"male",i:"♂",b:"Male"},{v:"nb",i:"⚧",b:"Non-binary"},{v:"skip",i:"→",b:"Prefer to skip"}]},
+{id:"climate",title:"What's your climate like?",sub:"Environment changes texture choices — and how much hydration your barrier loses daily.",multi:false,opts:[
+ {v:"humid",i:"🌴",b:"Hot & humid",s:"Gel textures, oil control"},{v:"dry",i:"🏜️",b:"Hot & dry",s:"Humectants + sealing"},{v:"cold",i:"❄️",b:"Cold / windy",s:"Richer creams, barrier lipids"},{v:"temperate",i:"🌦️",b:"Temperate / four seasons",s:"Seasonal switching"},{v:"urban",i:"🏙️",b:"Big city / pollution",s:"Antioxidant priority"}]},
+{id:"routine",title:"Your current routine looks like…",sub:"This sets your starting frequency for actives — jumping in at 'advanced' is how barriers get broken.",multi:false,opts:[
+ {v:"none",i:"🧼",b:"Soap & luck",s:"Cleanser at most"},{v:"basic",i:"🧴",b:"The basics",s:"Cleanser + moisturiser (± SPF)"},{v:"some",i:"⚗️",b:"Dabbling in actives",s:"1–2 serums, semi-regular"},{v:"full",i:"🧪",b:"Full routine",s:"Actives AM & PM, comfortable layering"}]},
+{id:"budget",title:"What's your budget comfort zone?",sub:"Great routines exist at every price. We'll rank products to match.",multi:false,opts:[
+ {v:"low",i:"💚",b:"Smart & minimal",s:"~NZ$15–30 per product"},{v:"mid",i:"💛",b:"Mid-range mix",s:"~NZ$30–80 per product"},{v:"high",i:"💎",b:"Invest in the best",s:"NZ$80+ where it counts"}]},
+{id:"skintype",title:"Which sounds most like your skin by mid-afternoon?",sub:"Your baseline skin type — pick the closest fit.",multi:false,opts:[
+ {v:"normal",i:"😌",b:"Normal",s:"Comfortable, rarely reactive"},{v:"dry",i:"🏔️",b:"Dry",s:"Tight, flaky, absorbs cream fast"},{v:"oily",i:"✨",b:"Oily",s:"Shine everywhere by noon"},{v:"combo",i:"🌗",b:"Combination",s:"Oily T-zone, normal/dry cheeks"},{v:"sensitive",i:"🌡️",b:"Sensitive",s:"Stings, flushes, reacts easily"},{v:"dehydrated",i:"🥀",b:"Dehydrated",s:"Dull + tight but can still be oily"},{v:"acne",i:"🌋",b:"Acne-prone",s:"Regular breakouts, congestion"},{v:"mature",i:"🕰️",b:"Mature",s:"Thinner, drier, losing firmness"}]},
+{id:"concerns",title:"What are you trying to change?",sub:"Choose up to 5 — we'll prioritise in this order.",multi:true,max:5,opts:[
+ {v:"acne",i:"🌋",b:"Acne"},{v:"blackheads",i:"⚫",b:"Blackheads"},{v:"pores",i:"🕳️",b:"Enlarged pores"},{v:"oil",i:"💦",b:"Excess oil"},{v:"dryness",i:"🏜️",b:"Dryness"},{v:"dehydration",i:"🥀",b:"Dehydration"},{v:"redness",i:"🌹",b:"Redness"},{v:"pigmentation",i:"🟤",b:"Pigmentation"},{v:"darkspots",i:"🔘",b:"Dark spots"},{v:"uneven",i:"🎭",b:"Uneven tone"},{v:"finelines",i:"〰️",b:"Fine lines"},{v:"wrinkles",i:"📉",b:"Wrinkles"},{v:"firmness",i:"🎈",b:"Loss of firmness"},{v:"dullness",i:"🌫️",b:"Dullness"},{v:"barrier",i:"🧱",b:"Barrier damage"},{v:"eyedark",i:"🌑",b:"Under-eye darkness"},{v:"eyebags",i:"👝",b:"Eye bags"},{v:"puffiness",i:"🎈",b:"Puffiness"}]},
+{id:"sensitivity",title:"How reactive is your skin to new products?",sub:"This calibrates strength and how fast we ramp up actives.",multi:false,opts:[
+ {v:"low",i:"🛡️",b:"Tough as leather",s:"Rarely reacts to anything"},{v:"med",i:"⚖️",b:"Occasionally touchy",s:"The odd sting or flush"},{v:"high",i:"🌡️",b:"Very reactive",s:"New products often backfire"},{v:"pregnant",i:"🤰",b:"Pregnant / breastfeeding",s:"Pregnancy-safe actives only"}]}
+];
+</script>
+<script>
+/* =================== STATE =================== */
+const S={answers:{},concerns:[],zones:new Set(),plan:null,qi:0,entries:[],metric:"hydration",ccPicks:new Set(),coachLog:[],coachWeek:1,pendingPhoto:null};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* =================== NAV =================== */
+function go(v){
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
+  $("v-"+v).classList.add("on");
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(v==="plan")renderPlanView();
+  if(v==="coach")renderCoach();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
+
+/* =================== FACE SVG =================== */
+function faceSVG(interactive){
+  const u=interactive?'-m':'-h';
+  const zonesShapes={
+    forehead:['<path class="zone" d="M98,132 C103,103 126,87 160,86 C194,87 217,103 222,132 C222,141 221,147 219,152 C180,138 140,138 101,152 C99,147 98,141 98,132 Z"/>','<text class="zone-label" x="160" y="116" text-anchor="middle">Forehead</text>'],
+    undereyes:['<ellipse class="zone" cx="122" cy="191" rx="24" ry="9"/>','<ellipse class="zone" cx="198" cy="191" rx="24" ry="9"/>','<text class="zone-label" x="160" y="207" text-anchor="middle">Under eyes</text>'],
+    nose:['<path class="zone" d="M149,152 C153,148 167,148 171,152 L176,222 C169,236 151,236 144,222 Z"/>','<text class="zone-label" x="160" y="168" text-anchor="middle">Nose</text>'],
+    cheeks:['<ellipse class="zone" cx="106" cy="228" rx="27" ry="23"/>','<ellipse class="zone" cx="214" cy="228" rx="27" ry="23"/>','<text class="zone-label" x="106" y="228" text-anchor="middle">Cheek</text>','<text class="zone-label" x="214" y="228" text-anchor="middle">Cheek</text>'],
+    smile:['<path class="zone" d="M133,236 C123,252 123,268 133,283 L144,277 C136,265 136,251 143,240 Z"/>','<path class="zone" d="M187,236 C197,252 197,268 187,283 L176,277 C184,265 184,251 177,240 Z"/>','<text class="zone-label" x="160" y="293" text-anchor="middle">Smile lines</text>'],
+    lips:['<ellipse class="zone" cx="160" cy="266" rx="28" ry="13"/>','<text class="zone-label" x="160" y="248" text-anchor="middle">Lips</text>'],
+    chin:['<ellipse class="zone" cx="160" cy="297" rx="21" ry="12"/>','<text class="zone-label" x="160" y="318" text-anchor="middle">Chin</text>'],
+    neck:['<path class="zone" d="M132,306 L132,342 C132,352 144,358 160,358 C176,358 188,352 188,342 L188,306 C170,316 150,316 132,306 Z"/>','<text class="zone-label" x="160" y="347" text-anchor="middle">Neck</text>']
+  };
+  let g="";
+  for(const z in zonesShapes){
+    g+='<g class="zone-g" data-z="'+z+'">'+zonesShapes[z].join("")+"</g>";
+  }
+  return '<svg viewBox="0 0 320 400" width="100%" style="max-width:'+(interactive?'380':'320')+'px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Face zone map">'+
+  '<defs><radialGradient id="skinG'+u+'" cx="50%" cy="38%" r="75%"><stop offset="0%" stop-color="#F9ECDD"/><stop offset="100%" stop-color="#EFD9C0"/></radialGradient><linearGradient id="hairG'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BCA184"/><stop offset="100%" stop-color="#93765A"/></linearGradient></defs>'+
+  '<path d="M70,400 C82,366 112,350 160,350 C208,350 238,366 250,400 Z" fill="#EDE0CE" stroke="#DFCDB4"/>'+
+  '<path d="M160,28 C240,28 272,95 266,180 C263,224 252,256 240,276 C232,282 222,282 216,276 C228,238 232,200 230,164 C226,102 200,66 160,66 C120,66 94,102 90,164 C88,200 92,238 104,276 C98,282 88,282 80,276 C68,256 57,224 54,180 C48,95 80,28 160,28 Z" fill="url(#hairG'+u+')"/>'+
+  '<path d="M134,296 L134,340 C134,351 145,357 160,357 C175,357 186,351 186,340 L186,296 Z" fill="url(#skinG'+u+')" stroke="#E2C6A8"/>'+
+  '<path d="M134,296 L134,312 C150,322 170,322 186,312 L186,296 Z" fill="#E3C3A3" opacity=".5"/>'+
+  '<path d="M160,52 C212,52 246,96 246,162 C246,206 236,244 214,274 C198,296 180,314 160,314 C140,314 122,296 106,274 C84,244 74,206 74,162 C74,96 108,52 160,52 Z" fill="url(#skinG'+u+')" stroke="#E2C6A8" stroke-width="1.5"/>'+
+  '<path d="M160,50 C116,50 90,78 86,126 C102,86 128,70 160,70 C192,70 218,86 234,126 C230,78 204,50 160,50 Z" fill="url(#hairG'+u+')"/>'+
+  '<ellipse cx="112" cy="224" rx="16" ry="9" fill="#E8A88E" opacity=".22"/>'+
+  '<ellipse cx="208" cy="224" rx="16" ry="9" fill="#E8A88E" opacity=".22"/>'+
+  '<path d="M104,150 C114,142 130,141 142,148" fill="none" stroke="#8F7457" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M178,148 C190,141 206,142 216,150" fill="none" stroke="#8F7457" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M108,164 C116,158 130,158 137,164" fill="none" stroke="#DCC0A4" stroke-width="1.2"/>'+
+  '<path d="M183,164 C190,158 204,158 212,164" fill="none" stroke="#DCC0A4" stroke-width="1.2"/>'+
+  '<path d="M106,172 C114,163 130,163 138,172 C130,179 114,179 106,172 Z" fill="#FFFFFF" stroke="#A3846B" stroke-width="1.2"/>'+
+  '<circle cx="122" cy="171.5" r="5" fill="#6E523B"/><circle cx="122" cy="171.5" r="2.2" fill="#33261B"/><circle cx="120.4" cy="169.8" r="1.1" fill="#FFF"/>'+
+  '<path d="M182,172 C190,163 206,163 214,172 C206,179 190,179 182,172 Z" fill="#FFFFFF" stroke="#A3846B" stroke-width="1.2"/>'+
+  '<circle cx="198" cy="171.5" r="5" fill="#6E523B"/><circle cx="198" cy="171.5" r="2.2" fill="#33261B"/><circle cx="196.4" cy="169.8" r="1.1" fill="#FFF"/>'+
+  '<path d="M104,171 C102,169 101,168 99,167" fill="none" stroke="#8F7457" stroke-width="1.5" stroke-linecap="round"/>'+
+  '<path d="M216,171 C218,169 219,168 221,167" fill="none" stroke="#8F7457" stroke-width="1.5" stroke-linecap="round"/>'+
+  '<path d="M157,182 C155,200 153,212 150,224 C152,231 160,234 167,229" fill="none" stroke="#D8B090" stroke-width="2" stroke-linecap="round"/>'+
+  '<path d="M146,226 C144,229 145,231 148,232" fill="none" stroke="#D8B090" stroke-width="1.5" stroke-linecap="round"/>'+
+  '<path d="M136,262 C144,255 152,254 160,258 C168,254 176,255 184,262 C176,273 166,276 160,275 C154,276 144,273 136,262 Z" fill="#D69A8B" stroke="#C2806F" stroke-width="1"/>'+
+  '<path d="M136,262 C152,267 168,267 184,262" fill="none" stroke="#B06F5E" stroke-width="1"/>'+
+  '<path d="M151,291 C157,295 163,295 169,291" fill="none" stroke="#E6C8AA" stroke-width="1.5" stroke-linecap="round"/>'+
+  g+"</svg>";
+}
+function initFaceMap(){
+  $("face-svg-holder").innerHTML=faceSVG(true);
+  $("face-svg-holder").querySelectorAll(".zone-g").forEach(gr=>{
+    gr.addEventListener("click",()=>toggleZone(gr.dataset.z));
+  });
+  const pillZones=["forehead","tzone","nose","undereyes","cheeks","smile","lips","chin","neck"];
+  $("zone-pills").innerHTML=pillZones.map(z=>'<button class="zone-pill" data-z="'+z+'">'+ZONES[z].emoji+" "+esc(ZONES[z].name.split(" (")[0])+"</button>").join("");
+  $("zone-pills").querySelectorAll(".zone-pill").forEach(p=>p.onclick=()=>toggleZone(p.dataset.z));
+  const hero=$("hero-face");
+  if(hero){hero.innerHTML=faceSVG(false);hero.querySelectorAll(".zone").forEach(z=>{z.style.fill="rgba(95,125,108,.06)";z.style.stroke="rgba(95,125,108,.18)";z.style.pointerEvents="none"});}
+}
+function toggleZone(z){
+  if(S.zones.has(z))S.zones.delete(z);else S.zones.add(z);
+  syncZoneUI();
+}
+function syncZoneUI(){
+  $("face-svg-holder").querySelectorAll(".zone-g").forEach(gr=>{
+    const on=S.zones.has(gr.dataset.z);
+    gr.classList.toggle("sel",on);
+    gr.querySelectorAll(".zone").forEach(s=>s.classList.toggle("sel",on));
+  });
+  document.querySelectorAll("#zone-pills .zone-pill").forEach(p=>p.classList.toggle("sel",S.zones.has(p.dataset.z)));
+  renderZoneDetails();
+}
+function renderZoneDetails(){
+  const box=$("zone-details");
+  $("zone-empty").style.display=S.zones.size?"none":"block";
+  let zs=[...S.zones];
+  // auto-suggest T-zone
+  const tset=["forehead","nose","chin"].filter(z=>S.zones.has(z));
+  let html="";
+  if(tset.length>=2&&!S.zones.has("tzone"))
+    html+='<div class="notice sage" style="margin-bottom:14px">⛰️ <span><b>T-zone pattern detected.</b> Forehead + nose/chin concerns often share one cause: sebum. <button style="text-decoration:underline;font-weight:700" onclick="toggleZone(\'tzone\')">Add the T-zone module</button> for combined advice.</span></div>';
+  html+=zs.map(z=>{
+    const Z=ZONES[z];
+    const acts=Z.actives.map(a=>{
+      const A=ACTIVES[a.id];
+      return '<div class="active-row"><div class="active-ico" style="background:'+A.color+'22;color:'+A.color+'">'+A.emoji+'</div><div><h4>'+esc(A.name)+' <button class="chip chip-line" style="cursor:pointer" onclick="openActive(\''+a.id+'\')">learn ↗</button></h4><p>'+esc(a.why)+'</p><div class="mini-prods"><b>Try:</b> '+Z.prods.filter(p=>PRODUCTS.find(x=>x.id===p&&x.active===a.id)).slice(0,3).map(p=>{const pr=PRODUCTS.find(x=>x.id===p);return esc(pr.brand+" "+pr.name)}).join(" · ")+'</div></div></div>';
+    }).join("");
+    return '<div class="card pad zone-detail"><div class="zd-head"><h3 class="serif" style="font-size:19px">'+Z.emoji+" "+esc(Z.name)+'</h3><button class="chip chip-clay" style="cursor:pointer" onclick="toggleZone(\''+z+'\')">✕ remove</button></div><p class="small" style="margin-bottom:8px">'+esc(Z.analysis)+'</p><div class="tagrow" style="margin-bottom:6px">'+Z.concerns.map(c=>'<span class="chip chip-sage">'+esc(c)+"</span>").join("")+"</div>"+acts+"</div>";
+  }).join("");
+  box.innerHTML=html;
+}
+
+/* =================== QUIZ =================== */
+function renderQuiz(){
+  $("quiz-steps").innerHTML=QUIZ.map((q,i)=>{
+    const opts=q.opts.map(o=>'<button class="opt" data-q="'+q.id+'" data-v="'+o.v+'"><span class="tick">✓</span>'+(o.i?'<span class="oi">'+o.i+"</span>":"")+"<b>"+esc(o.b)+"</b>"+(o.s?"<span>"+esc(o.s)+"</span>":"")+"</button>").join("");
+    return '<div class="qstep'+(i===0?" on":"")+'" data-step="'+i+'"><div class="qtitle serif">'+esc(q.title)+'</div><div class="qsub">'+esc(q.sub)+'</div><div class="opt-grid">'+opts+"</div></div>";
+  }).join("");
+  $("quiz-steps").querySelectorAll(".opt").forEach(b=>{
+    b.onclick=()=>{
+      const q=QUIZ.find(x=>x.id===b.dataset.q);
+      if(q.multi){
+        const cur=S.answers[q.id]||[];
+        if(cur.includes(b.dataset.v)){S.answers[q.id]=cur.filter(v=>v!==b.dataset.v);b.classList.remove("sel");}
+        else if(cur.length<(q.max||99)){S.answers[q.id]=[...cur,b.dataset.v];b.classList.add("sel");}
+      }else{
+        S.answers[q.id]=b.dataset.v;
+        b.parentElement.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+        b.classList.add("sel");
+        setTimeout(()=>quizNav(1),260);
+      }
+      updateQuizChrome();
+    };
+  });
+  updateQuizChrome();
+}
+function updateQuizChrome(){
+  const q=QUIZ[S.qi];
+  $("quiz-prog").style.width=Math.round((S.qi)/QUIZ.length*100+8)+"%";
+  $("q-count").textContent=(S.qi+1)+" / "+QUIZ.length;
+  $("q-back").style.visibility=S.qi===0?"hidden":"visible";
+  const a=S.answers[q.id];
+  const answered=q.multi?(a&&a.length):(a||q.optional);
+  $("q-next").textContent=S.qi===QUIZ.length-1?"Finish → Face map":"Continue →";
+  $("q-next").disabled=!answered&&!q.optional;
+}
+function quizNav(d){
+  const q=QUIZ[S.qi];
+  if(d>0){const a=S.answers[q.id];if(!(q.multi?(a&&a.length):a)&&!q.optional)return;}
+  const ni=S.qi+d;
+  if(ni>=QUIZ.length){finishQuiz();return}
+  if(ni<0)return;
+  document.querySelectorAll(".qstep").forEach(s=>s.classList.remove("on"));
+  document.querySelector('.qstep[data-step="'+ni+'"]').classList.add("on");
+  S.qi=ni;updateQuizChrome();
+}
+function finishQuiz(){
+  S.concerns=S.answers.concerns||[];
+  // pre-select zones from concerns
+  const map={eyedark:"undereyes",eyebags:"undereyes",puffiness:"undereyes",blackheads:"tzone",oil:"tzone",pores:"tzone",dryness:"cheeks",redness:"cheeks",pigmentation:"cheeks",darkspots:"cheeks",finelines:"smile",wrinkles:"smile"};
+  S.concerns.forEach(c=>{if(map[c])S.zones.add(map[c])});
+  syncZoneUI();
+  go("facemap");
+}
+
+/* =================== RECOMMENDATION ENGINE =================== */
+const CMAP={acne:["retinoids","bha","azelaic"],blackheads:["bha","niacinamide"],pores:["niacinamide","bha"],oil:["niacinamide","bha"],dryness:["ceramides","ha","squalane"],dehydration:["ha","ceramides"],redness:["azelaic","centella","ceramides"],pigmentation:["vitc","azelaic","retinoids"],darkspots:["vitc","azelaic","retinoids"],uneven:["vitc","niacinamide","aha"],finelines:["retinoids","peptides","ha"],wrinkles:["retinoids","peptides","vitc"],firmness:["peptides","retinoids","vitc"],dullness:["vitc","aha","ha"],barrier:["ceramides","centella","ha"],eyedark:["caffeine","vitc"],eyebags:["caffeine","peptides"],puffiness:["caffeine","peptides"]};
+const CLABEL={acne:"Acne",blackheads:"Blackheads",pores:"Enlarged pores",oil:"Excess oil",dryness:"Dryness",dehydration:"Dehydration",redness:"Redness",pigmentation:"Pigmentation",darkspots:"Dark spots",uneven:"Uneven tone",finelines:"Fine lines",wrinkles:"Wrinkles",firmness:"Loss of firmness",dullness:"Dullness",barrier:"Barrier damage",eyedark:"Under-eye darkness",eyebags:"Eye bags",puffiness:"Puffiness"};
+const TYPELABEL={normal:"Normal",dry:"Dry",oily:"Oily",combo:"Combination",sensitive:"Sensitive",dehydrated:"Dehydrated",acne:"Acne-prone",mature:"Mature"};
+const AGELABEL={under20:"Under 20","20s":"20s","30s":"30s","40s":"40s","50s":"50s","60plus":"60+"};
+
+function pickProds(activeId,n){
+  const budget=S.answers.budget||"mid";
+  const t=S.answers.skintype;
+  const tl={normal:"Normal",dry:"Dry",oily:"Oily",combo:"Combination",sensitive:"Sensitive",dehydrated:"Dry",acne:"Acne-prone",mature:"Mature"}[t];
+  let list=PRODUCTS.filter(p=>p.active===activeId);
+  list=list.map(p=>{
+    let s=p.score;
+    if(tl&&(p.types.includes(tl)||p.types.includes("All")))s+=1.2;
+    if(budget==="low")s+=p.price==="$"?2.2:(p.price==="$$"?0.4:-2);
+    if(budget==="mid")s+=p.price==="$$"?1:(p.price==="$"?0.5:-0.6);
+    if(budget==="high")s+=p.price==="$$$"?1:0;
+    return{...p,adj:s};
+  }).sort((a,b)=>b.adj-a.adj);
+  return list.slice(0,n||3);
+}
+function levelFor(){
+  const r=S.answers.routine,sens=S.answers.sensitivity;
+  if(sens==="high"||sens==="pregnant")return"Beginner";
+  if(r==="full")return"Advanced";
+  if(r==="some")return"Intermediate";
+  return"Beginner";
+}
+function buildPlan(){
+  if(!S.answers.skintype){alert("Complete the assessment first — it takes about 2 minutes.");go("quiz");return}
+  const sens=S.answers.sensitivity,preg=sens==="pregnant",hs=sens==="high";
+  const age=S.answers.age,older=["30s","40s","50s","60plus"].includes(age);
+  const t=S.answers.skintype;
+  // score actives from concerns (priority-weighted)
+  const score={};
+  (S.concerns.length?S.concerns:["barrier"]).forEach((c,i)=>{
+    (CMAP[c]||[]).forEach((a,j)=>{score[a]=(score[a]||0)+(5-Math.min(i,4))*(3-Math.min(j,2))});
+  });
+  // zone influence
+  S.zones.forEach(z=>ZONES[z].actives.forEach((a,j)=>score[a.id]=(score[a.id]||0)+2-j*0.5));
+  // type & age boosts
+  if(["oily","combo","acne"].includes(t)){score.niacinamide=(score.niacinamide||0)+4;score.bha=(score.bha||0)+3}
+  if(["dry","dehydrated","sensitive","mature"].includes(t)){score.ha=(score.ha||0)+4;score.ceramides=(score.ceramides||0)+4}
+  if(t==="sensitive"){score.centella=(score.centella||0)+3;score.azelaic=(score.azelaic||0)+2}
+  if(older){score.retinoids=(score.retinoids||0)+4;score.peptides=(score.peptides||0)+2;score.vitc=(score.vitc||0)+2}
+  // safety filters
+  const subs=[];
+  if(preg){
+    if(score.retinoids){subs.push("Retinoids removed (pregnancy) → azelaic acid carries the acne/pigment load; it's one of the best-evidenced pregnancy-safe actives.");score.azelaic=(score.azelaic||0)+score.retinoids;delete score.retinoids}
+    if(score.aha){delete score.aha}
+    if(score.bha){subs.push("High-strength BHA limited in pregnancy → keeping it out; azelaic covers congestion.");delete score.bha}
+  }
+  if(hs){
+    if(score.aha){delete score.aha;subs.push("AHA removed (very reactive skin) → lactic acid could be trialled later, once your barrier is settled.")}
+    if(score.retinoids){score.bakuchiol=(score.bakuchiol||0)+score.retinoids*0.8;score.retinoids*=0.5;subs.push("Retinoid kept but at slow-lane pace — bakuchiol added as the gentler co-pilot.")}
+    score.centella=(score.centella||0)+3;score.ceramides=(score.ceramides||0)+3;
+  }
+  // AM treatment
+  const pigmenty=S.concerns.some(c=>["pigmentation","darkspots","uneven","dullness"].includes(c));
+  const oily=S.concerns.some(c=>["oil","pores","blackheads","acne"].includes(c))||["oily","combo","acne"].includes(t);
+  const redness=S.concerns.includes("redness")||t==="sensitive";
+  let am1=pigmenty&&!hs?"vitc":(oily?"niacinamide":(redness?"azelaic":"ha"));
+  if(hs&&am1==="vitc")am1="azelaic";
+  // PM active
+  let pm1=null;
+  if(score.retinoids&&!preg)pm1="retinoids";
+  else if(preg)pm1="azelaic";
+  else if(hs)pm1="bakuchiol";
+  else if(score.aha)pm1="aha";
+  else pm1=oily?"niacinamide":"peptides";
+  // weekly exfoliant
+  let wk=null;
+  if(!preg){
+    if(oily&&score.bha)wk="bha";
+    else if(score.aha&&!hs)wk="aha";
+  }else if(oily){wk=null}
+  // secondary supports
+  const support=["ha","ceramides","peptides","centella","squalane"].filter(a=>score[a]).sort((a,b)=>score[b]-score[a]).slice(0,3);
+  // eye
+  const eyeAM=S.concerns.some(c=>["eyedark","eyebags","puffiness"].includes(c))||S.zones.has("undereyes")?"caffeine":null;
+  const eyePM=(older||S.concerns.includes("finelines")||S.concerns.includes("wrinkles"))&&S.zones.has("undereyes")?(hs||preg?"peptides":"retinoids"):null;
+  // moisturiser + cleanser + spf choices
+  const moist=["dry","sensitive","mature","dehydrated"].includes(t)||S.answers.climate==="cold"?(older?"sc-tlr":"cerave-cream"):(oily?"de-protini":"cerave-cream");
+  const cleanser=["oily","combo","acne"].includes(t)?"cerave-foam":"cerave-hydrating";
+  const spfPick=pickProds("spf",1)[0];
+  const lvl=levelFor();
+  // week rotation
+  const week=buildWeek(pm1,wk,lvl,hs||preg);
+  // conflicts among chosen
+  const chosen=[...new Set([am1,pm1,wk,...support,eyeAM,eyePM].filter(Boolean))];
+  const confs=findConflicts(chosen);
+  S.plan={am1,pm1,wk,support,eyeAM,eyePM,moist,cleanser,spf:spfPick.id,lvl,week,chosen,confs,subs,preg,hs};
+  renderPlanView();go("plan");
+  document.querySelector('#nav button[data-v="plan"]').innerHTML='3 · My Plan<span class="dot"></span>';
+}
+function buildWeek(pm1,wk,lvl,gentle){
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const R=pm1?ACTIVES[pm1].name.split(" (")[0]:"—";
+  const W=wk?ACTIVES[wk].name.split(" (")[0]:null;
+  let nights;
+  if(!pm1)nights=days.map(()=>["Hydration"]);
+  else if(lvl==="Beginner"||gentle)nights={Mon:[R],Tue:["Hydration"],Wed:[W||"Hydration"],Thu:[R],Fri:["Barrier repair"],Sat:[W&&lvl!=="Beginner"?W:"Hydration"],Sun:["Barrier repair"]};
+  else if(lvl==="Intermediate")nights={Mon:[R],Tue:[W||"Hydration"],Wed:[R],Thu:["Barrier repair"],Fri:[R],Sat:[W||"Hydration"],Sun:["Barrier repair"]};
+  else nights={Mon:[R],Tue:[R],Wed:[W||R],Thu:[R],Fri:[R],Sat:[W||R],Sun:["Barrier repair"]};
+  return days.map(d=>({d,acts:Array.isArray(nights)?nights.shift():nights[d]}));
+}
+function findConflicts(list){
+  const out=[];const seen=new Set();
+  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){
+    const r=CONFLICTS.find(c=>(c.a===list[i]&&c.b===list[j])||(c.a===list[j]&&c.b===list[i]));
+    if(r&&!seen.has(r.a+r.b)){seen.add(r.a+r.b);out.push(r)}
+  }
+  return out;
+}
+
+/* =================== PLAN RENDER =================== */
+function stepHTML(n,name,why,prodId){
+  const p=prodId?PRODUCTS.find(x=>x.id===prodId):null;
+  return '<div class="rstep"><div class="rstep-num">'+n+'</div><div><b>'+esc(name)+'</b><div class="why">'+esc(why)+'</div>'+(p?'<div class="prod">→ '+esc(p.brand+" · "+p.name)+" ("+esc(p.priceNote)+")</div>":"")+"</div></div>";
+}
+function sevChip(s){
+  return s==="high"?'<span class="sev" style="background:var(--bad-l);color:var(--bad)">avoid together</span>':s==="med"?'<span class="sev" style="background:var(--warn-l);color:var(--warn)">use with care</span>':s==="none"?'<span class="sev" style="background:var(--good-l);color:var(--good)">myth — safe</span>':'<span class="sev" style="background:var(--gold-l);color:#8a6f38">minor / timing</span>';
+}
+function dayTagColor(a){
+  if(/Retin|Bakuchiol|Azelaic|Niacinamide|Peptide/i.test(a))return"background:#EFE7F6;color:#6b4d95";
+  if(/Salicylic|Glycolic|Lactic/i.test(a))return"background:#E3EEF8;color:#2d6399";
+  if(/Barrier/i.test(a))return"background:#F3EAD9;color:#8a6f38";
+  return"background:var(--sage-l);color:var(--sage-d)";
+}
+function renderPlanView(){
+  const h=$("plan-holder");
+  if(!S.plan){
+    h.innerHTML='<div class="card locked"><div class="big">🔒</div><h3 class="serif">Your plan is waiting to be built</h3><p>Complete the 2-minute assessment and pick your face zones — then the engine assembles your routine.</p><button class="btn btn-primary" onclick="go(\'quiz\')">Start assessment →</button></div>';
+    return;
+  }
+  const P=S.plan,a=S.answers;
+  const chips=[TYPELABEL[a.skintype],AGELABEL[a.age],{humid:"Humid climate",dry:"Dry climate",cold:"Cold climate",temperate:"Temperate",urban:"Urban/pollution"}[a.climate],P.lvl+" pace",...(S.concerns.slice(0,4).map(c=>CLABEL[c]))].filter(Boolean);
+  const actCard=(id,slot,why)=>{
+    const A=ACTIVES[id];const prods=pickProds(id,2);
+    return '<div class="card pad" style="border-top:4px solid '+A.color+'"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:24px">'+A.emoji+'</div><span class="chip chip-line">'+slot+'</span></div><h3 class="serif" style="font-size:18px;margin:8px 0 2px">'+esc(A.name)+'</h3><p class="small">→ '+esc(why||A.blurb)+'</p><div class="mini-prods" style="margin-top:9px"><b>Top pick:</b> '+(prods[0]?esc(prods[0].brand+" "+prods[0].name):"—")+'</div><button class="chip chip-sage" style="cursor:pointer;margin-top:10px" onclick="openActive(\''+id+'\')">Full dossier ↗</button></div>';
+  };
+  let amCards=[actCard(P.am1,"☀️ Morning")];
+  if(P.eyeAM)amCards.push(actCard(P.eyeAM,"☀️ Eyes"));
+  let pmCards=[];
+  if(P.pm1)pmCards.push(actCard(P.pm1,"🌙 Night"));
+  if(P.eyePM)pmCards.push(actCard(P.eyePM,"🌙 Eyes"));
+  if(P.wk)pmCards.push(actCard(P.wk,"📅 Weekly"));
+  const supCards=P.support.map(s=>actCard(s,"🤝 Support"));
+  const amProd=id=>pickProds(id,1)[0];
+  const spf=PRODUCTS.find(x=>x.id===P.spf),mo=PRODUCTS.find(x=>x.id===P.moist),cl=PRODUCTS.find(x=>x.id===P.cleanser);
+  const conflictHTML=P.confs.length?P.confs.map(c=>'<div class="conflict-item"><div class="pair">'+ACTIVES[c.a].emoji+" "+esc(ACTIVES[c.a].name.split(" (")[0])+" + "+ACTIVES[c.b].emoji+" "+esc(ACTIVES[c.b].name.split(" (")[0])+" "+sevChip(c.sev)+'</div><p>'+esc(c.why)+'</p><p style="color:var(--sage-d)"><b>Plan:</b> '+esc(c.fix)+"</p></div>").join(""):'<div class="notice sage">✅ <span>No risky combinations in your plan — the rotation calendar already keeps strong actives apart.</span></div>';
+  const prodPool=[...new Set([P.am1,P.pm1,P.wk,P.eyeAM,P.eyePM].filter(Boolean))].flatMap(id=>pickProds(id,3).map(p=>({...p,for:ACTIVES[id].name.split(" (")[0]})));
+  const uniq=[];const ids=new Set();
+  prodPool.forEach(p=>{if(!ids.has(p.id)){ids.add(p.id);uniq.push(p)}});
+  uniq.sort((x,y)=>y.adj-x.adj);
+  h.innerHTML=
+  '<div class="profile-banner"><div class="eyebrow" style="color:#cfe0d5">Step 3 of 3 · Your personalised plan</div><h2>Your Skin Profile</h2><p style="opacity:.9;max-width:640px">'+esc(profileNarrative())+'</p><div class="chips">'+chips.map(c=>'<span class="chip">'+esc(c)+"</span>").join("")+"</div></div>"
+  +(P.subs.length?'<div class="notice warn" style="margin-bottom:20px">🛡️ <span><b>Safety adjustments made for you:</b><br>'+P.subs.map(esc).join("<br>")+"</span></div>":"")
+  +'<h3 class="serif" style="font-size:22px;margin:8px 0 14px">Recommended actives</h3><div class="grid3">'+amCards.concat(pmCards).join("")+"</div>"
+  +(supCards.length?'<h3 class="serif" style="font-size:18px;margin:22px 0 12px">Supporting cast</h3><div class="grid3">'+supCards.join("")+"</div>":"")
+  +'<h3 class="serif" style="font-size:22px;margin:30px 0 4px">Your daily routines</h3><div class="routine-cols">'
+  +'<div class="card routine-col"><h3>☀️ Morning</h3>'
+    +stepHTML(1,"Cleanser","Lukewarm water, 30 seconds, no scrubbing",P.cleanser)
+    +stepHTML(2,ACTIVES[P.am1].name.split(" (")[0]+" serum",ACTIVES[P.am1].blurb,amProd(P.am1)?amProd(P.am1).id:null)
+    +(P.eyeAM?stepHTML(3,"Eye care — "+ACTIVES[P.eyeAM].name.split(" (")[0],"Ring finger, gentle pats, orbital bone only",amProd(P.eyeAM).id):"")
+    +stepHTML(P.eyeAM?4:3,"Moisturiser","Locks the serum in; adjusts to your climate",P.moist)
+    +stepHTML(P.eyeAM?5:4,"SPF 30–50 — every single day","The step that makes every other step work",P.spf)
+  +"</div>"
+  +'<div class="card routine-col"><h3>🌙 Night</h3>'
+    +stepHTML(1,"Cleanser","Double-cleanse if you wore SPF/makeup",P.cleanser)
+    +(P.pm1?stepHTML(2,"Active treatment — "+ACTIVES[P.pm1].name.split(" (")[0],"On rotation nights only — see calendar below",amProd(P.pm1)?amProd(P.pm1).id:null):"")
+    +stepHTML(3,"Hydrating serum","On active nights this buffers; on rest nights it repairs",amProd(P.support[0]||"ha")?amProd(P.support[0]||"ha").id:null)
+    +(P.eyePM?stepHTML(4,"Eye treatment — "+ACTIVES[P.eyePM].name.split(" (")[0],"Tiny amount; avoid the lash line",amProd(P.eyePM).id):"")
+    +stepHTML(P.eyePM?5:4,"Moisturiser","Seals everything; slightly richer than your AM one is fine",P.moist)
+  +"</div></div>"
+  +'<h3 class="serif" style="font-size:22px;margin:30px 0 2px">Weekly rotation calendar</h3><p class="small">Nights only — mornings stay the same daily. '+(P.lvl==="Beginner"?"Beginner pace: strong actives twice a week, barrier nights in between.":P.lvl==="Intermediate"?"Intermediate pace: actives most nights, one full recovery night.":"Advanced pace: nightly actives with one reset night — drop back if you see flaking.")+"</p>"
+  +'<div class="week-grid">'+P.week.map(w=>'<div class="day-cell"><b>'+w.d+"</b>"+w.acts.map(x=>'<span class="day-tag" style="'+dayTagColor(x)+'">'+esc(x)+"</span>").join("")+"</div>").join("")+"</div>"
+  +'<h3 class="serif" style="font-size:22px;margin:30px 0 12px">Conflict check on this plan</h3>'+conflictHTML
+  +'<h3 class="serif" style="font-size:22px;margin:30px 0 2px">Your ranked products</h3><p class="small">Ranked by dermatologist standing, clinical evidence, reviews, value and fit for your skin type and budget.</p><div class="prod-grid">'+uniq.slice(0,9).map((p,i)=>prodCard(p,i+1)).join("")+"</div>"
+  +'<div style="display:flex;gap:10px;margin-top:28px;flex-wrap:wrap"><button class="btn btn-sage" onclick="go(\'tracker\')">Start tracking progress →</button><button class="btn btn-ghost" onclick="go(\'coach\')">Meet your weekly coach</button></div>';
+}
+function profileNarrative(){
+  const a=S.answers,t=a.skintype;
+  const bits=[];
+  bits.push({normal:"Balanced baseline — your job is protection and smart maintenance",dry:"Your barrier runs short on lipids, so hydration + ceramides anchor everything",oily:"Sebum is your main variable — regulate it and pores, texture and shine follow",combo:"Two skins, one face: your T-zone and cheeks get different treatment",sensitive:"Reactivity comes first: every active enters slowly, buffered, one at a time",dehydrated:"Your skin lacks water (not oil) — humectants and barrier sealing come before any actives",acne:"Congestion control + inflammation calming, with evidence-first actives",mature:"Collagen support, barrier lipids and diligent SPF do the heavy lifting"}[t]);
+  if(S.concerns.length)bits.push("priority concerns: "+S.concerns.slice(0,3).map(c=>CLABEL[c].toLowerCase()).join(", "));
+  if(S.zones.size)bits.push("zone focus: "+[...S.zones].slice(0,4).map(z=>ZONES[z].name.split(" (")[0].toLowerCase()).join(", "));
+  return bits.join(" · ")+".";
+}
+function prodCard(p,rank){
+  const stars="★".repeat(Math.round(p.rating))+"☆".repeat(5-Math.round(p.rating));
+  const rb=rank<=3?"background:var(--gold-l);color:#8a6f38":"background:var(--sage-xl);color:var(--sage-d)";
+  return '<div class="card prod-card"><div class="prod-top"><div><div class="prod-brand">'+esc(p.brand)+'</div><h4>'+esc(p.name)+"</h4></div>"+(rank?'<div class="rank-badge" style="'+rb+'">#'+rank+"</div>":"")+'</div>'
+  +'<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip chip-sage">'+esc(ACTIVES[p.active].name.split(" (")[0])+'</span><span class="chip chip-line">'+esc(p.price)+" · "+esc(p.priceNote)+"</span></div>"
+  +'<div class="stars">'+stars+' <span style="color:var(--ink2);font-size:12px">'+p.rating.toFixed(1)+"</span></div>"
+  +'<div class="review-line">“'+esc(p.reviews)+'”</div>'
+  +'<div class="prod-meta"><span>Best for: '+esc(p.bestFor)+"</span></div>"
+  +'<div class="prod-meta"><span>Match score</span><b>'+(p.adj?p.adj.toFixed(1):p.score.toFixed(1))+"/12</b></div>"
+  +'<div class="score-bar"><i style="width:'+Math.min(100,(p.adj||p.score)/12*100)+'%"></i></div>'
+  +'<div class="prod-meta"><span>Popularity</span><span>'+p.pop+"/100</span></div>"
+  +'<div class="buy-row">'+p.retail.map(r=>'<span class="buy-chip">'+esc(r)+"</span>").join("")+"</div></div>";
+}
+
+/* =================== LIBRARY & MODAL =================== */
+function renderLibrary(){
+  const cats=["All",...new Set(Object.values(ACTIVES).map(a=>a.cat))];
+  $("lib-filters").innerHTML=cats.map((c,i)=>'<button class="fbtn'+(i===0?" sel":"")+'" data-c="'+c+'">'+c+"</button>").join("");
+  $("lib-filters").querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{
+    $("lib-filters").querySelectorAll(".fbtn").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");drawLib(b.dataset.c);
+  });
+  drawLib("All");
+  $("stat-actives").textContent=Object.keys(ACTIVES).length;
+  $("stat-prods").textContent=PRODUCTS.length;
+  $("stat-conf").textContent=CONFLICTS.length;
+}
+function drawLib(cat){
+  $("ing-grid").innerHTML=Object.entries(ACTIVES).filter(([k,a])=>cat==="All"||a.cat===cat).map(([k,a])=>
+    '<div class="card ing-card" onclick="openActive(\''+k+'\')"><div class="band" style="background:'+a.color+'"></div><div class="ing-emoji">'+a.emoji+'</div><div class="cat">'+a.cat+'</div><h3>'+esc(a.name)+"</h3><p>"+esc(a.blurb)+'</p><div class="tagrow"><span class="chip chip-line">'+(a.am?"☀️ AM ":"")+(a.pm?"🌙 PM":"")+"</span>"+(a.clash.length?'<span class="chip chip-warn">'+a.clash.length+" conflict"+(a.clash.length>1?"s":"")+"</span>":'<span class="chip chip-good">plays well with all</span>')+"</div></div>").join("");
+}
+function openActive(id){
+  const a=ACTIVES[id];
+  const prods=pickProds(id,3);
+  $("modal").innerHTML='<button class="modal-close" onclick="closeModal()">✕</button>'
+  +'<div class="modal-head" style="background:linear-gradient(135deg,'+a.color+'26,'+a.color+'0d)"><div style="font-size:34px">'+a.emoji+'</div><div class="cat" style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-top:6px">'+a.cat+'</div><h2 class="serif" style="font-size:26px">'+esc(a.name)+"</h2></div>"
+  +'<div class="modal-body"><h4 style="font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px">What it does</h4><p style="font-size:14.5px">'+esc(a.what)+"</p>"
+  +'<div class="usage-grid"><div class="usage-box"><h5>Best for</h5><ul class="check">'+a.bestFor.map(x=>"<li>"+esc(x)+"</li>").join("")+'</ul></div><div class="usage-box"><h5>Avoid / consult if</h5><ul class="cross">'+a.avoid.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul></div></div>"
+  +'<div class="usage-grid"><div class="usage-box"><h5>When</h5><p style="font-size:20px">'+(a.am?"☀️ Morning &nbsp;":"")+(a.pm?"🌙 Night":"")+"</p>"+(a.am&&!a.pm?'<p class="muted">Morning active — pair with SPF.</p>':"")+(!a.am&&a.pm?'<p class="muted">Night-only — degrades or sensitises in sunlight.</p>':"")+'</div><div class="usage-box"><h5>Frequency by level</h5><table class="freq-table">'+Object.entries(a.freq).map(([k,v])=>"<tr><td>"+k+"</td><td>"+esc(v)+"</td></tr>").join("")+"</table></div></div>"
+  +'<div class="usage-grid"><div class="usage-box"><h5>Pairs beautifully with</h5><div class="tagrow">'+a.pairs.map(p=>'<span class="chip chip-good">'+ACTIVES[p].emoji+" "+esc(ACTIVES[p].name.split(" (")[0])+"</span>").join("")+'</div></div><div class="usage-box"><h5>Keep apart from</h5><div class="tagrow">'+(a.clash.length?a.clash.map(p=>'<span class="chip chip-bad">'+ACTIVES[p].emoji+" "+esc(ACTIVES[p].name.split(" (")[0])+"</span>").join(""):'<span class="chip chip-good">Nothing — a true team player</span>')+"</div></div></div>"
+  +'<div class="notice sage" style="margin:6px 0 16px">💡 <span>'+esc(a.tip)+"</span></div>"
+  +'<h4 style="font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Top products for you</h4><div class="prod-grid">'+prods.map((p,i)=>prodCard(p,i+1)).join("")+"</div></div>";
+  $("modal-bg").classList.add("on");document.body.style.overflow="hidden";
+}
+function closeModal(){$("modal-bg").classList.remove("on");document.body.style.overflow=""}
+
+/* =================== CONFLICT CHECKER =================== */
+function renderCC(){
+  $("cc-picks").innerHTML=Object.entries(ACTIVES).map(([k,a])=>'<button class="fbtn'+(S.ccPicks.has(k)?" sel":"")+'" data-a="'+k+'">'+a.emoji+" "+esc(a.name.split(" (")[0])+"</button>").join("");
+  $("cc-picks").querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{
+    S.ccPicks.has(b.dataset.a)?S.ccPicks.delete(b.dataset.a):S.ccPicks.add(b.dataset.a);renderCC();
+  });
+  const list=[...S.ccPicks];
+  const res=$("cc-results");
+  if(list.length<2){res.innerHTML='<div class="card pad"><h3 class="serif" style="font-size:18px">Verdict appears here</h3><p class="small" style="margin-top:6px">Select at least two actives to check. The engine tests every pair against '+CONFLICTS.length+' interaction rules, plus an over-exfoliation count.</p></div>';return}
+  const confs=findConflicts(list);
+  const exfoliants=list.filter(x=>["aha","bha","retinoids"].includes(x));
+  let html="";
+  const real=confs.filter(c=>c.sev!=="none");
+  if(!real.length)html+='<div class="notice sage" style="margin-bottom:12px">✅ <span><b>This combination is safe to run.</b> Layer thinnest to thickest, introduce one new product per fortnight, and keep SPF daily.</span></div>';
+  else html+='<div class="notice '+(real.some(c=>c.sev==="high")?"bad":"warn")+'" style="margin-bottom:12px">'+(real.some(c=>c.sev==="high")?"⛔":"⚠️")+' <span><b>'+real.length+" interaction"+(real.length>1?"s":"")+" flagged.</b> Nothing here is forbidden forever — it's about scheduling. See the rotation below.</span></div>";
+  html+=confs.map(c=>'<div class="conflict-item"><div class="pair">'+ACTIVES[c.a].emoji+" "+esc(ACTIVES[c.a].name.split(" (")[0])+" + "+ACTIVES[c.b].emoji+" "+esc(ACTIVES[c.b].name.split(" (")[0])+" "+sevChip(c.sev)+"</div><p>"+esc(c.why)+'</p><p style="color:var(--sage-d)"><b>Fix:</b> '+esc(c.fix)+"</p></div>").join("");
+  if(exfoliants.length>=2){
+    const rot=buildWeek(exfoliants.includes("retinoids")?"retinoids":exfoliants[0],exfoliants.find(x=>x!=="retinoids"&&["aha","bha"].includes(x))||null,"Beginner",false);
+    html+='<div class="card pad" style="margin-top:14px"><h3 class="serif" style="font-size:17px;margin-bottom:4px">Suggested rotation method</h3><p class="small">Strong actives take turns — your barrier gets recovery nights between them.</p><div class="week-grid">'+rot.map(w=>'<div class="day-cell"><b>'+w.d+"</b>"+w.acts.map(x=>'<span class="day-tag" style="'+dayTagColor(x)+'">'+esc(x)+"</span>").join("")+"</div>").join("")+"</div></div>";
+  }
+  res.innerHTML=html;
+}
+
+/* =================== TRACKER =================== */
+const METRICS=[{k:"hydration",n:"Hydration",e:"💧"},{k:"texture",n:"Texture",e:"🪨"},{k:"pigmentation",n:"Pigmentation",e:"🟤"},{k:"acne",n:"Breakouts",e:"🌋"},{k:"redness",n:"Redness",e:"🌹"}];
+function renderTrackerForm(){
+  $("tk-sliders").innerHTML=METRICS.map(m=>'<div class="slider-row"><label>'+m.e+" "+m.n+' <output id="out-'+m.k+'">5</output>/10</label><input type="range" min="0" max="10" value="5" id="sl-'+m.k+'" oninput="$(\'out-'+m.k+'\').value=this.value"></div>').join("");
+  $("tk-date").value=new Date().toISOString().slice(0,10);
+  $("metric-tabs").innerHTML=METRICS.map((m,i)=>'<button class="fbtn'+(m.k===S.metric?" sel":"")+'" data-m="'+m.k+'">'+m.e+" "+m.n+"</button>").join("");
+  $("metric-tabs").querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{S.metric=b.dataset.m;renderTrackerForm();drawChart();});
+  $("tk-photo").onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=ev=>{S.pendingPhoto=ev.target.result;$("photo-preview").innerHTML='<img class="photo-thumb" src="'+S.pendingPhoto+'">'};r.readAsDataURL(f);
+  };
+  $("tk-import").onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(Array.isArray(d.entries)){S.entries=d.entries;refreshTracker();}}catch(err){alert("Couldn't read that file — expected a Skin Coach export (.json).")}};r.readAsText(f);
+  };
+}
+function saveEntry(){
+  const e={date:$("tk-date").value||new Date().toISOString().slice(0,10),notes:$("tk-notes").value,photo:S.pendingPhoto};
+  METRICS.forEach(m=>e[m.k]=+$("sl-"+m.k).value);
+  S.entries=S.entries.filter(x=>x.date!==e.date).concat(e).sort((a,b)=>a.date<b.date?-1:1);
+  S.pendingPhoto=null;$("photo-preview").innerHTML="";$("tk-notes").value="";
+  refreshTracker();
+}
+function refreshTracker(){drawChart();drawEntries();drawTable();}
+function drawEntries(){
+  if(!S.entries.length){$("entry-list").innerHTML='<p class="muted">No entries yet. Your first check-in becomes your baseline.</p>';return}
+  $("entry-list").innerHTML=[...S.entries].reverse().map((e,ri)=>{
+    const i=S.entries.length-1-ri;
+    const avg=(METRICS.reduce((s,m)=>s+(m.k==="acne"||m.k==="redness"||m.k==="pigmentation"?10-e[m.k]:e[m.k]),0)/METRICS.length).toFixed(1);
+    return '<div class="entry-card">'+(e.photo?'<img class="entry-photo" src="'+e.photo+'">':'<div class="entry-photo">🌿</div>')+'<div style="flex:1"><b style="font-size:14px">'+esc(e.date)+'</b> <span class="chip chip-sage" style="margin-left:6px">skin score '+avg+"/10</span>"+(e.notes?'<p class="small" style="margin-top:3px">'+esc(e.notes)+"</p>":"")+'</div><button class="chip chip-line" style="cursor:pointer" onclick="delEntry('+i+')">✕</button></div>';
+  }).join("");
+}
+function delEntry(i){S.entries.splice(i,1);refreshTracker();}
+function drawChart(){
+  const box=$("tk-chart");
+  const M=METRICS.find(m=>m.k===S.metric);
+  if(S.entries.length<1){box.innerHTML='<p class="muted" style="padding:30px 10px;text-align:center">Log check-ins to see your '+M.n.toLowerCase()+' trend. Two points make a line; eight make a verdict.</p>';return}
+  const W=560,H=220,pl=34,pr=14,pt=16,pb=30;
+  const xs=i=>pl+(S.entries.length===1?((W-pl-pr)/2):i*(W-pl-pr)/(S.entries.length-1));
+  const ys=v=>pt+(10-v)*(H-pt-pb)/10;
+  let grid="";
+  for(let v=0;v<=10;v+=2)grid+='<line x1="'+pl+'" y1="'+ys(v)+'" x2="'+(W-pr)+'" y2="'+ys(v)+'" stroke="#EAE3D9" stroke-width="1"/><text x="'+(pl-8)+'" y="'+(ys(v)+3.5)+'" text-anchor="end" font-size="10" fill="#8A8177">'+v+"</text>";
+  const pts=S.entries.map((e,i)=>({x:xs(i),y:ys(e[S.metric]),v:e[S.metric],d:e.date}));
+  const path=pts.map((p,i)=>(i?"L":"M")+p.x+","+p.y).join(" ");
+  const area=pts.length>1?path+" L"+pts[pts.length-1].x+","+ys(0)+" L"+pts[0].x+","+ys(0)+" Z":"";
+  let dots="",hits="",labels="";
+  pts.forEach((p,i)=>{
+    dots+='<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#5F7D6C" stroke="#fff" stroke-width="2"/>';
+    hits+='<circle cx="'+p.x+'" cy="'+p.y+'" r="13" fill="transparent" data-i="'+i+'" class="hit" style="cursor:pointer"/>';
+    if(i===0||i===pts.length-1)labels+='<text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" font-size="11" font-weight="600" fill="#221E1A">'+p.v+"</text>";
+    labels+='<text x="'+p.x+'" y="'+(H-8)+'" text-anchor="middle" font-size="9.5" fill="#8A8177">'+p.d.slice(5)+"</text>";
+  });
+  box.innerHTML='<svg viewBox="0 0 '+W+" "+H+'" width="100%" role="img" aria-label="'+M.n+' trend chart">'+grid+(area?'<path d="'+area+'" fill="#5F7D6C18"/>':"")+(pts.length>1?'<path d="'+path+'" fill="none" stroke="#5F7D6C" stroke-width="2" stroke-linejoin="round"/>':"")+dots+labels+hits+"</svg>";
+  box.querySelectorAll(".hit").forEach(c=>{
+    c.addEventListener("mouseenter",ev=>{
+      const p=pts[+c.dataset.i];const tip=$("chart-tip");
+      tip.textContent=p.d+" · "+M.n+" "+p.v+"/10";
+      const r=box.getBoundingClientRect(),scale=r.width/W;
+      tip.style.left=(p.x*scale+16)+"px";tip.style.top=(p.y*scale+16)+"px";tip.style.display="block";
+    });
+    c.addEventListener("mouseleave",()=>$("chart-tip").style.display="none");
+  });
+}
+function drawTable(){
+  if(!S.entries.length){$("tk-table").innerHTML="";return}
+  $("tk-table").innerHTML='<table class="data-table"><thead><tr><th>Date</th>'+METRICS.map(m=>"<th>"+m.n+"</th>").join("")+'</tr></thead><tbody>'+S.entries.map(e=>"<tr><td>"+esc(e.date)+"</td>"+METRICS.map(m=>"<td>"+e[m.k]+"</td>").join("")+"</tr>").join("")+"</tbody></table>";
+}
+function toggleTable(){const t=$("tk-table");t.style.display=t.style.display==="none"?"block":"none";}
+function exportLog(){
+  const blob=new Blob([JSON.stringify({app:"Skin Intelligence Coach",exported:new Date().toISOString(),entries:S.entries},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="skin-progress-log.json";a.click();
+}
+
+/* =================== COACH =================== */
+function renderCoach(){
+  const h=$("coach-holder");
+  const hasPlan=!!S.plan;
+  let convo=S.coachLog.map(m=>'<div class="coach-msg">'+(m.who==="coach"?'<div class="coach-avatar">S</div><div class="coach-bubble">':'<div style="flex:1"></div><div class="coach-bubble user">')+m.html+"</div></div>").join("");
+  h.innerHTML='<div class="eyebrow">AI Skin Coach · Week '+S.coachWeek+'</div><h2 class="serif" style="font-size:28px;margin-bottom:6px">Weekly check-in</h2><p class="lede" style="margin-bottom:24px">'+(hasPlan?"Your routine isn't static — it responds. Tell me how your skin took this week and I'll adjust the plan.":"Build your plan first so I have something to adjust — but you can still tell me how your skin is doing.")+"</p>"
+  +convo
+  +'<div class="coach-msg"><div class="coach-avatar">S</div><div class="coach-bubble"><b>How is your skin responding this week?</b><div class="mood-row">'
+  +'<button class="mood-btn" onclick="coachRespond(\'improved\')"><span class="em">😊</span><b>Improved</b><span>calmer, clearer, brighter</span></button>'
+  +'<button class="mood-btn" onclick="coachRespond(\'same\')"><span class="em">😐</span><b>About the same</b><span>no real change yet</span></button>'
+  +'<button class="mood-btn" onclick="coachRespond(\'irritated\')"><span class="em">😟</span><b>Irritated</b><span>red, tight, flaky, stinging</span></button>'
+  +"</div></div></div>";
+  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+}
+function coachRespond(mood){
+  const P=S.plan;
+  const moodTxt={improved:"😊 Improved",same:"😐 About the same",irritated:"😟 Irritated"}[mood];
+  S.coachLog.push({who:"user",html:moodTxt});
+  let reply="";
+  if(mood==="improved"){
+    S.coachStreak=(S.coachStreak||0)+1;
+    if(S.coachStreak>=3&&P&&P.lvl!=="Advanced"){
+      reply="<b>Three good weeks in a row — your skin has adapted.</b> 🎉 You've earned a step up: "+(P.lvl==="Beginner"?"I'm moving you from 2 active nights to the intermediate rotation (3–4 nights/week).":"moving you toward the advanced rotation — actives most nights, one weekly reset.")+" I've updated your calendar. Keep the SPF religious; that's what protects these gains.";
+      if(P){P.lvl=P.lvl==="Beginner"?"Intermediate":"Advanced";P.week=buildWeek(P.pm1,P.wk,P.lvl,P.hs||P.preg);renderPlanView();}
+      S.coachStreak=0;
+    }else{
+      reply="<b>Excellent — that's the compounding starting.</b> Change nothing: consistency beats intensity every time. "+(P?"Stay on the "+P.lvl.toLowerCase()+" rotation":"Keep doing what you're doing")+", log a check-in in the tracker, and if we get "+(3-(S.coachStreak||0))+" more good week"+((3-(S.coachStreak||0))>1?"s":"")+" like this, I'll consider stepping up your active frequency.";
+    }
+  }else if(mood==="same"){
+    S.coachStreak=0;
+    S.sameCount=(S.sameCount||0)+1;
+    reply=S.sameCount>=3?"<b>Three flat weeks — time to look closer.</b> Before changing actives, audit the basics: Are you using enough SPF (¼ teaspoon)? Applying actives to dry skin? Using them the scheduled nights, actually? If yes to all, "+(P&&P.wk?"let's add one extra "+ACTIVES[P.wk].name.split(" (")[0]+" night":"let's talk about adding a weekly exfoliant")+" — small increments, not overhauls.":"<b>Perfectly normal.</b> Real change takes 8–12 weeks — retinoids and peptides are marathon ingredients, and pigment fades on skin-cycle timelines. The routine is working invisibly right now. Hold steady, take a progress photo so future-you has evidence, and check in next week.";
+  }else{
+    S.coachStreak=0;
+    reply="<b>Your barrier is asking for a break — we listen to that.</b> 🛡️ Here's the recovery protocol I've set:<br><br>1. <b>Pause</b> all exfoliating acids "+(P&&P.pm1==="retinoids"?"and retinoids":"")+" for 5–7 days.<br>2. <b>Simplify</b> to cleanser → hydrating serum → ceramide moisturiser (morning + night) + SPF.<br>3. <b>Rescue layer:</b> La Roche-Posay Cicaplast Baume B5+ on any tight or flaky areas.<br>4. When calm, restart <b>one</b> active at half frequency, buffered over moisturiser.<br><br>I've switched your calendar to barrier-repair mode. Stinging on contact with plain moisturiser = fully stop actives and give it two weeks.";
+    if(P){P.week=[["Mon"],["Tue"],["Wed"],["Thu"],["Fri"],["Sat"],["Sun"]].map(d=>({d:d[0],acts:["Barrier repair"]}));renderPlanView();}
+  }
+  S.coachLog.push({who:"coach",html:reply});
+  S.coachWeek++;
+  renderCoach();
+}
+
+/* =================== CREDIT FOOTER =================== */
+function toggleEmail(){
+  const v=$("email-val"),b=$("email-btn");
+  const showing=v.style.display!=="none";
+  v.style.display=showing?"none":"inline";
+  b.style.display=showing?"inline":"none";
+}
+
+/* =================== INIT =================== */
+renderQuiz();initFaceMap();renderLibrary();renderCC();renderTrackerForm();refreshTracker();
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+</script>
+</body>
+</html>
