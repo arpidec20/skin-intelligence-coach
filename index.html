@@ -681,45 +681,90 @@ document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.v
 function faceSVG(interactive){
   const u=interactive?'-m':'-h';
   const zonesShapes={
-    forehead:['<path class="zone" d="M98,132 C103,103 126,87 160,86 C194,87 217,103 222,132 C222,141 221,147 219,152 C180,138 140,138 101,152 C99,147 98,141 98,132 Z"/>','<text class="zone-label" x="160" y="116" text-anchor="middle">Forehead</text>'],
-    undereyes:['<ellipse class="zone" cx="122" cy="191" rx="24" ry="9"/>','<ellipse class="zone" cx="198" cy="191" rx="24" ry="9"/>','<text class="zone-label" x="160" y="207" text-anchor="middle">Under eyes</text>'],
-    nose:['<path class="zone" d="M149,152 C153,148 167,148 171,152 L176,222 C169,236 151,236 144,222 Z"/>','<text class="zone-label" x="160" y="168" text-anchor="middle">Nose</text>'],
-    cheeks:['<ellipse class="zone" cx="106" cy="228" rx="27" ry="23"/>','<ellipse class="zone" cx="214" cy="228" rx="27" ry="23"/>','<text class="zone-label" x="106" y="228" text-anchor="middle">Cheek</text>','<text class="zone-label" x="214" y="228" text-anchor="middle">Cheek</text>'],
-    smile:['<path class="zone" d="M133,236 C123,252 123,268 133,283 L144,277 C136,265 136,251 143,240 Z"/>','<path class="zone" d="M187,236 C197,252 197,268 187,283 L176,277 C184,265 184,251 177,240 Z"/>','<text class="zone-label" x="160" y="293" text-anchor="middle">Smile lines</text>'],
-    lips:['<ellipse class="zone" cx="160" cy="266" rx="28" ry="13"/>','<text class="zone-label" x="160" y="248" text-anchor="middle">Lips</text>'],
-    chin:['<ellipse class="zone" cx="160" cy="297" rx="21" ry="12"/>','<text class="zone-label" x="160" y="318" text-anchor="middle">Chin</text>'],
-    neck:['<path class="zone" d="M132,306 L132,342 C132,352 144,358 160,358 C176,358 188,352 188,342 L188,306 C170,316 150,316 132,306 Z"/>','<text class="zone-label" x="160" y="347" text-anchor="middle">Neck</text>']
+    forehead:['<path class="zone" d="M100,138 C104,104 128,84 160,82 C192,84 216,104 220,138 C220,146 219,151 217,155 C180,142 140,142 103,155 C101,151 100,146 100,138 Z"/>','<text class="zone-label" x="160" y="114" text-anchor="middle">Forehead</text>'],
+    undereyes:['<ellipse class="zone" cx="122" cy="190" rx="23" ry="9"/>','<ellipse class="zone" cx="198" cy="190" rx="23" ry="9"/>','<text class="zone-label" x="160" y="206" text-anchor="middle">Under eyes</text>'],
+    nose:['<path class="zone" d="M150,150 C154,146 166,146 170,150 L175,224 C168,237 152,237 145,224 Z"/>','<text class="zone-label" x="160" y="166" text-anchor="middle">Nose</text>'],
+    cheeks:['<ellipse class="zone" cx="105" cy="226" rx="25" ry="23"/>','<ellipse class="zone" cx="215" cy="226" rx="25" ry="23"/>','<text class="zone-label" x="105" y="226" text-anchor="middle">Cheek</text>','<text class="zone-label" x="215" y="226" text-anchor="middle">Cheek</text>'],
+    smile:['<path class="zone" d="M132,236 C122,252 122,268 132,283 L143,277 C135,265 135,251 142,240 Z"/>','<path class="zone" d="M188,236 C198,252 198,268 188,283 L177,277 C185,265 185,251 178,240 Z"/>','<text class="zone-label" x="160" y="291" text-anchor="middle">Smile lines</text>'],
+    lips:['<ellipse class="zone" cx="160" cy="265" rx="27" ry="13"/>','<text class="zone-label" x="160" y="246" text-anchor="middle">Lips</text>'],
+    chin:['<ellipse class="zone" cx="160" cy="293" rx="20" ry="12"/>','<text class="zone-label" x="160" y="314" text-anchor="middle">Chin</text>'],
+    neck:['<path class="zone" d="M138,300 L138,340 C138,350 148,356 160,356 C172,356 182,350 182,340 L182,300 C168,310 152,310 138,300 Z"/>','<text class="zone-label" x="160" y="345" text-anchor="middle">Neck</text>']
   };
   let g="";
   for(const z in zonesShapes){
     g+='<g class="zone-g" data-z="'+z+'">'+zonesShapes[z].join("")+"</g>";
   }
-  return '<svg viewBox="0 0 320 400" width="100%" style="max-width:'+(interactive?'380':'320')+'px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Face zone map">'+
-  '<defs><radialGradient id="skinG'+u+'" cx="50%" cy="38%" r="75%"><stop offset="0%" stop-color="#F9ECDD"/><stop offset="100%" stop-color="#EFD9C0"/></radialGradient><linearGradient id="hairG'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BCA184"/><stop offset="100%" stop-color="#93765A"/></linearGradient></defs>'+
-  '<path d="M70,400 C82,366 112,350 160,350 C208,350 238,366 250,400 Z" fill="#EDE0CE" stroke="#DFCDB4"/>'+
-  '<path d="M160,28 C240,28 272,95 266,180 C263,224 252,256 240,276 C232,282 222,282 216,276 C228,238 232,200 230,164 C226,102 200,66 160,66 C120,66 94,102 90,164 C88,200 92,238 104,276 C98,282 88,282 80,276 C68,256 57,224 54,180 C48,95 80,28 160,28 Z" fill="url(#hairG'+u+')"/>'+
-  '<path d="M134,296 L134,340 C134,351 145,357 160,357 C175,357 186,351 186,340 L186,296 Z" fill="url(#skinG'+u+')" stroke="#E2C6A8"/>'+
-  '<path d="M134,296 L134,312 C150,322 170,322 186,312 L186,296 Z" fill="#E3C3A3" opacity=".5"/>'+
-  '<path d="M160,52 C212,52 246,96 246,162 C246,206 236,244 214,274 C198,296 180,314 160,314 C140,314 122,296 106,274 C84,244 74,206 74,162 C74,96 108,52 160,52 Z" fill="url(#skinG'+u+')" stroke="#E2C6A8" stroke-width="1.5"/>'+
-  '<path d="M160,50 C116,50 90,78 86,126 C102,86 128,70 160,70 C192,70 218,86 234,126 C230,78 204,50 160,50 Z" fill="url(#hairG'+u+')"/>'+
-  '<ellipse cx="112" cy="224" rx="16" ry="9" fill="#E8A88E" opacity=".22"/>'+
-  '<ellipse cx="208" cy="224" rx="16" ry="9" fill="#E8A88E" opacity=".22"/>'+
-  '<path d="M104,150 C114,142 130,141 142,148" fill="none" stroke="#8F7457" stroke-width="3.5" stroke-linecap="round"/>'+
-  '<path d="M178,148 C190,141 206,142 216,150" fill="none" stroke="#8F7457" stroke-width="3.5" stroke-linecap="round"/>'+
-  '<path d="M108,164 C116,158 130,158 137,164" fill="none" stroke="#DCC0A4" stroke-width="1.2"/>'+
-  '<path d="M183,164 C190,158 204,158 212,164" fill="none" stroke="#DCC0A4" stroke-width="1.2"/>'+
-  '<path d="M106,172 C114,163 130,163 138,172 C130,179 114,179 106,172 Z" fill="#FFFFFF" stroke="#A3846B" stroke-width="1.2"/>'+
-  '<circle cx="122" cy="171.5" r="5" fill="#6E523B"/><circle cx="122" cy="171.5" r="2.2" fill="#33261B"/><circle cx="120.4" cy="169.8" r="1.1" fill="#FFF"/>'+
-  '<path d="M182,172 C190,163 206,163 214,172 C206,179 190,179 182,172 Z" fill="#FFFFFF" stroke="#A3846B" stroke-width="1.2"/>'+
-  '<circle cx="198" cy="171.5" r="5" fill="#6E523B"/><circle cx="198" cy="171.5" r="2.2" fill="#33261B"/><circle cx="196.4" cy="169.8" r="1.1" fill="#FFF"/>'+
-  '<path d="M104,171 C102,169 101,168 99,167" fill="none" stroke="#8F7457" stroke-width="1.5" stroke-linecap="round"/>'+
-  '<path d="M216,171 C218,169 219,168 221,167" fill="none" stroke="#8F7457" stroke-width="1.5" stroke-linecap="round"/>'+
-  '<path d="M157,182 C155,200 153,212 150,224 C152,231 160,234 167,229" fill="none" stroke="#D8B090" stroke-width="2" stroke-linecap="round"/>'+
-  '<path d="M146,226 C144,229 145,231 148,232" fill="none" stroke="#D8B090" stroke-width="1.5" stroke-linecap="round"/>'+
-  '<path d="M136,262 C144,255 152,254 160,258 C168,254 176,255 184,262 C176,273 166,276 160,275 C154,276 144,273 136,262 Z" fill="#D69A8B" stroke="#C2806F" stroke-width="1"/>'+
-  '<path d="M136,262 C152,267 168,267 184,262" fill="none" stroke="#B06F5E" stroke-width="1"/>'+
-  '<path d="M151,291 C157,295 163,295 169,291" fill="none" stroke="#E6C8AA" stroke-width="1.5" stroke-linecap="round"/>'+
-  g+"</svg>";
+  return '<svg viewBox="0 0 320 400" width="100%" style="max-width:'+(interactive?'380':'320')+'px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Face zone map">'
+  +'<defs>'
+  +'<radialGradient id="skinG'+u+'" cx="50%" cy="36%" r="72%"><stop offset="0%" stop-color="#FAEDDD"/><stop offset="70%" stop-color="#F3DFC7"/><stop offset="100%" stop-color="#EAD0B2"/></radialGradient>'
+  +'<linearGradient id="hairG'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6B5138"/><stop offset="45%" stop-color="#57402C"/><stop offset="100%" stop-color="#3E2D1F"/></linearGradient>'
+  +'<radialGradient id="irisG'+u+'" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#8A6844"/><stop offset="100%" stop-color="#4A331F"/></radialGradient>'
+  +'<linearGradient id="lipG'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C4837A"/><stop offset="100%" stop-color="#D99C8B"/></linearGradient>'
+  +'<filter id="soft'+u+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>'
+  +'<filter id="soft2'+u+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>'
+  +'</defs>'
+  /* shoulders & top */
+  +'<path d="M66,400 C80,362 112,346 160,346 C208,346 240,362 254,400 Z" fill="#E4E9E2" stroke="#D3DBD2"/>'
+  +'<path d="M136,346 C144,356 176,356 184,346 L184,360 C170,368 150,368 136,360 Z" fill="#F3DFC7"/>'
+  /* hair back mass */
+  +'<path d="M160,22 C228,22 262,74 260,150 C259,196 250,240 236,268 C230,278 219,281 213,275 C224,242 228,206 226,166 C223,110 198,74 160,74 C122,74 97,110 94,166 C92,206 96,242 107,275 C101,281 90,278 84,268 C70,240 61,196 60,150 C58,74 92,22 160,22 Z" fill="url(#hairG'+u+')"/>'
+  /* neck */
+  +'<path d="M140,288 L140,338 C140,349 149,355 160,355 C171,355 180,349 180,338 L180,288 Z" fill="url(#skinG'+u+')" stroke="#E0C2A2" stroke-width="1"/>'
+  +'<path d="M140,288 L140,308 C152,318 168,318 180,308 L180,288 Z" fill="#D9B28C" opacity=".5" filter="url(#soft2'+u+')"/>'
+  /* ears */
+  +'<path d="M82,170 C73,163 68,174 72,190 C75,202 84,208 88,201 Z" fill="url(#skinG'+u+')" stroke="#DCBB99" stroke-width="1"/>'
+  +'<path d="M238,170 C247,163 252,174 248,190 C245,202 236,208 232,201 Z" fill="url(#skinG'+u+')" stroke="#DCBB99" stroke-width="1"/>'
+  +'<path d="M76,176 C74,182 76,190 80,194" fill="none" stroke="#C9A27E" stroke-width="1.2"/>'
+  +'<path d="M244,176 C246,182 244,190 240,194" fill="none" stroke="#C9A27E" stroke-width="1.2"/>'
+  /* face */
+  +'<path d="M160,58 C205,58 236,88 240,140 C242,168 240,196 232,222 C224,250 206,282 182,300 C174,306 167,310 160,310 C153,310 146,306 138,300 C114,282 96,250 88,222 C80,196 78,168 80,140 C84,88 115,58 160,58 Z" fill="url(#skinG'+u+')" stroke="#E0C2A2" stroke-width="1.2"/>'
+  /* soft shading & light */
+  +'<ellipse cx="93" cy="200" rx="13" ry="55" fill="#D8AE86" opacity=".38" filter="url(#soft'+u+')"/>'
+  +'<ellipse cx="227" cy="200" rx="13" ry="55" fill="#D8AE86" opacity=".38" filter="url(#soft'+u+')"/>'
+  +'<ellipse cx="160" cy="118" rx="34" ry="19" fill="#FFF6E7" opacity=".55" filter="url(#soft'+u+')"/>'
+  +'<ellipse cx="160" cy="290" rx="12" ry="8" fill="#FFF2DF" opacity=".5" filter="url(#soft'+u+')"/>'
+  +'<ellipse cx="112" cy="226" rx="17" ry="10" fill="#E89C7F" opacity=".24" filter="url(#soft'+u+')"/>'
+  +'<ellipse cx="208" cy="226" rx="17" ry="10" fill="#E89C7F" opacity=".24" filter="url(#soft'+u+')"/>'
+  /* front hair — centre part */
+  +'<path d="M160,56 C116,56 90,80 86,124 C85,134 86,142 91,148 C99,112 119,89 148,84 C152,83.3 168,83.3 172,84 C201,89 221,112 229,148 C234,142 235,134 234,124 C230,80 204,56 160,56 Z" fill="url(#hairG'+u+')"/>'
+  +'<path d="M160,60 L160,81" stroke="#3E2D1F" stroke-width="1.6" opacity=".55" stroke-linecap="round"/>'
+  +'<path d="M70,150 C70,110 86,60 128,40" fill="none" stroke="#7C6042" stroke-width="1.6" opacity=".55"/>'
+  +'<path d="M250,150 C250,110 234,60 192,40" fill="none" stroke="#7C6042" stroke-width="1.6" opacity=".55"/>'
+  +'<path d="M100,44 C130,28 190,28 220,44" fill="none" stroke="#8A6C4C" stroke-width="3" opacity=".5" stroke-linecap="round"/>'
+  /* brows — filled tapered */
+  +'<path d="M102,156 C111,146 128,144 141,150 C142,152 141,155 138,154 C126,150 112,152 105,159 C102,159 101,158 102,156 Z" fill="#5E4630"/>'
+  +'<path d="M218,156 C209,146 192,144 179,150 C178,152 179,155 182,154 C194,150 208,152 215,159 C218,159 219,158 218,156 Z" fill="#5E4630"/>'
+  /* eyes */
+  +'<path d="M108,162 C114,156 130,156 136,161" fill="none" stroke="#E3C4A5" stroke-width="1"/>'
+  +'<path d="M184,161 C190,156 206,156 212,162" fill="none" stroke="#E3C4A5" stroke-width="1"/>'
+  +'<path d="M106,170 C112,162 132,162 138,170 C132,177 112,177 106,170 Z" fill="#FDFBF7" stroke="#B08E73" stroke-width=".8"/>'
+  +'<circle cx="122" cy="169.5" r="5.2" fill="url(#irisG'+u+')"/><circle cx="122" cy="169.5" r="2.3" fill="#241A12"/><circle cx="120.3" cy="167.6" r="1.2" fill="#FFF"/>'
+  +'<path d="M106,170 C112,161.5 132,161.5 138,170" fill="none" stroke="#3F2E1F" stroke-width="1.7" stroke-linecap="round"/>'
+  +'<path d="M109,174.5 C115,177.5 129,177.5 135,174.5" fill="none" stroke="#D8B492" stroke-width="1"/>'
+  +'<path d="M104.5,168.5 L100,165" stroke="#3F2E1F" stroke-width="1.3" stroke-linecap="round"/>'
+  +'<path d="M107,164.5 L103.5,160.5" stroke="#3F2E1F" stroke-width="1.2" stroke-linecap="round"/>'
+  +'<path d="M182,170 C188,162 208,162 214,170 C208,177 188,177 182,170 Z" fill="#FDFBF7" stroke="#B08E73" stroke-width=".8"/>'
+  +'<circle cx="198" cy="169.5" r="5.2" fill="url(#irisG'+u+')"/><circle cx="198" cy="169.5" r="2.3" fill="#241A12"/><circle cx="196.3" cy="167.6" r="1.2" fill="#FFF"/>'
+  +'<path d="M182,170 C188,161.5 208,161.5 214,170" fill="none" stroke="#3F2E1F" stroke-width="1.7" stroke-linecap="round"/>'
+  +'<path d="M185,174.5 C191,177.5 205,177.5 211,174.5" fill="none" stroke="#D8B492" stroke-width="1"/>'
+  +'<path d="M215.5,168.5 L220,165" stroke="#3F2E1F" stroke-width="1.3" stroke-linecap="round"/>'
+  +'<path d="M213,164.5 L216.5,160.5" stroke="#3F2E1F" stroke-width="1.2" stroke-linecap="round"/>'
+  /* nose */
+  +'<path d="M154,180 C152,198 150,210 147,222" fill="none" stroke="#E2BA96" stroke-width="1.4" opacity=".6"/>'
+  +'<path d="M166,180 C167,196 168,208 169,218" fill="none" stroke="#EDD5B8" stroke-width="1.1" opacity=".7"/>'
+  +'<path d="M146,224 C149,231 155,234.5 160,234.5 C165,234.5 171,231 174,224" fill="none" stroke="#D2A57F" stroke-width="1.7" stroke-linecap="round"/>'
+  +'<path d="M149,226 C147,229 148,231.5 151,231" fill="none" stroke="#BC8E6A" stroke-width="1.4" stroke-linecap="round"/>'
+  +'<path d="M171,226 C173,229 172,231.5 169,231" fill="none" stroke="#BC8E6A" stroke-width="1.4" stroke-linecap="round"/>'
+  +'<path d="M160,188 L160,210" stroke="#FCF1E0" stroke-width="1.4" opacity=".38" stroke-linecap="round"/>'
+  /* lips */
+  +'<path d="M160,244 L160,253" stroke="#E6C9AA" stroke-width="1.6" opacity=".7" stroke-linecap="round"/>'
+  +'<path d="M137,261 C146,254 154,252.5 159,256.5 C159.6,257 160.4,257 161,256.5 C166,252.5 174,254 183,261 C176,265 167,266.5 160,266 C153,266.5 144,265 137,261 Z" fill="url(#lipG'+u+')"/>'
+  +'<path d="M138,262 C146,273 153,277 160,277 C167,277 174,273 182,262 C174,267 166,269 160,269 C154,269 146,267 138,262 Z" fill="#DBA08F"/>'
+  +'<ellipse cx="160" cy="271.5" rx="9" ry="2.6" fill="#F2C3B0" opacity=".55"/>'
+  +'<path d="M137,261 C150,265.5 170,265.5 183,261" fill="none" stroke="#A5695A" stroke-width="1.2"/>'
+  /* jaw shadow + chin */
+  +'<path d="M150,296 C156,299.5 164,299.5 170,296" fill="none" stroke="#E2C0A0" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>'
+  +g+"</svg>";
 }
 function initFaceMap(){
   $("face-svg-holder").innerHTML=faceSVG(true);
